@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Mes Prélèvements</title>
+
+<!-- PWA -->
+<meta name="theme-color" content="#3b5bff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Prélèvements">
+<link rel="manifest" href="manifest.json">
+
+<!-- ╔══════════════════════════════════════════════════════╗
+     ║  REMPLACE CES 6 VALEURS PAR TON CONFIG FIREBASE    ║
+     ║  console.firebase.google.com → Paramètres projet   ║
+     ╚══════════════════════════════════════════════════════╝ -->
+<script>
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyAkLTdnYE3NE10sOO8AO6sr5_hbg3nfoqs",
+  authDomain:        "prelevement-c4a9b.firebaseapp.com",
+  projectId:         "prelevement-c4a9b",
+  storageBucket:     "prelevement-c4a9b.firebasestorage.app",
+  messagingSenderId: "451068858985",
+  appId:             "1:451068858985:web:4c3fdeb92f82b100f548f8"
+};
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg:          #f4f6fa;
+  --surface:     #ffffff;
+  --surface2:    #f0f2f7;
+  --border:      #e2e6f0;
+  --border2:     #cdd3e2;
+  --accent:      #3b5bff;
+  --accent-dim:  rgba(59,91,255,0.08);
+  --accent-soft: rgba(59,91,255,0.15);
+  --text:        #1a1d2e;
+  --text-muted:  #7880a0;
+  --danger:      #e8344a;
+  --danger-dim:  rgba(232,52,74,0.10);
+  --green:       #12b76a;
+  --green-dim:   rgba(18,183,106,0.10);
+  --orange:      #f59e0b;
+  --radius:      14px;
+  --shadow:      0 2px 12px rgba(59,91,255,0.07);
+  --shadow-md:   0 4px 24px rgba(59,91,255,0.13);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ── LOADING ── */
+#screen-loading {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border2); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--text-muted); }
+
+/* ── AUTH ── */
+#screen-auth {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; padding: 24px 18px 48px;
+}
+.auth-logo     { font-size: 50px; text-align: center; margin-bottom: 6px; }
+.auth-headline {
+  font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent); text-align: center; margin-bottom: 4px;
+}
+.auth-sub { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 28px; line-height: 1.6; }
+
+.auth-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 6px 20px 24px;
+  width: 100%; max-width: 420px; box-shadow: var(--shadow-md);
+}
+.auth-tabs { display: flex; border-bottom: 1px solid var(--border); margin: 0 -20px 20px; }
+.auth-tab {
+  flex: 1; text-align: center; padding: 14px 0;
+  font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);
+  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.18s;
+}
+.auth-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.auth-fields { display: flex; flex-direction: column; gap: 11px; margin-bottom: 14px; }
+.auth-input {
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: 11px; color: var(--text); font-family: 'Sora', sans-serif;
+  font-size: 16px; padding: 13px 14px; width: 100%; outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none;
+}
+.auth-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); background: var(--surface); }
+.auth-input::placeholder { color: #b0b8d0; }
+
+/* ── PASSWORD STRENGTH ── */
+.pwd-strength { margin-top: 6px; display: none; }
+.pwd-strength.show { display: block; }
+.pwd-bar { height: 4px; border-radius: 99px; background: var(--border); margin-bottom: 5px; overflow: hidden; }
+.pwd-fill { height: 100%; border-radius: 99px; transition: width 0.3s, background 0.3s; }
+.pwd-label { font-size: 11px; font-weight: 600; }
+.str-1 .pwd-fill  { width: 25%; background: var(--danger); }
+.str-2 .pwd-fill  { width: 50%; background: var(--orange); }
+.str-3 .pwd-fill  { width: 75%; background: var(--orange); }
+.str-4 .pwd-fill  { width: 100%; background: var(--green); }
+.str-1 .pwd-label { color: var(--danger); }
+.str-2 .pwd-label { color: var(--orange); }
+.str-3 .pwd-label { color: var(--orange); }
+.str-4 .pwd-label { color: var(--green); }
+
+.auth-msg {
+  font-size: 12px; font-weight: 500; padding: 10px 12px; border-radius: 9px;
+  margin-bottom: 12px; display: none; line-height: 1.4;
+}
+.auth-msg.error   { color: var(--danger); background: var(--danger-dim); border: 1px solid rgba(232,52,74,0.2); }
+.auth-msg.success { color: var(--green);  background: var(--green-dim);  border: 1px solid rgba(18,183,106,0.2); }
+
+.btn-auth {
+  width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 12px;
+  font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 15px; cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(59,91,255,0.25);
+}
+.btn-auth:active   { transform: scale(0.98); opacity: 0.9; }
+.btn-auth:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+.auth-forgot {
+  text-align: center; margin-top: 14px; font-size: 12px;
+  color: var(--text-muted); cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px; transition: color 0.18s;
+}
+.auth-forgot:hover { color: var(--accent); }
+
+/* ── APP ── */
+#screen-app { min-height: 100vh; padding-bottom: 110px; }
+
+/* ── HEADER ── */
+.header {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 16px 18px 0; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow);
+}
+.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 6px; }
+.header-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.app-title {
+  font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); white-space: nowrap;
+}
+.user-label { font-size: 10px; color: var(--text-muted); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.header-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.icon-btn {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted);
+  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.07em;
+  padding: 6px 8px; border-radius: 8px; cursor: pointer; transition: all 0.18s; white-space: nowrap;
+}
+.icon-btn:active { opacity: 0.7; }
+.icon-btn.manage { background: var(--accent-dim); border-color: var(--accent-soft); color: var(--accent); }
+.icon-btn.manage.active { background: var(--green-dim); border-color: rgba(18,183,106,0.3); color: var(--green); }
+.icon-btn.logout-btn { background: var(--danger-dim); border-color: rgba(232,52,74,0.2); color: var(--danger); }
+
+/* ── SUMMARY ── */
+.summary {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px;
+  background: var(--border); border-top: 1px solid var(--border); margin: 0 -18px;
+}
+.summary-cell { background: var(--surface); padding: 10px 8px 12px; text-align: center; }
+.summary-value {
+  font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+  display: block; margin-bottom: 2px;
+}
+.summary-value.total    { color: var(--text); }
+.summary-value.paid     { color: var(--green); }
+.summary-value.remaining{ color: var(--accent); }
+.summary-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+
+/* ── PROGRESS ── */
+.progress-wrap { background: var(--surface); padding: 8px 18px 12px; border-bottom: 1px solid var(--border); }
+.progress-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.progress-label { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+.progress-pct   { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--accent); font-weight: 700; }
+.progress-track { height: 5px; background: var(--surface2); border-radius: 99px; overflow: hidden; border: 1px solid var(--border); }
+.progress-fill  {
+  height: 100%; background: linear-gradient(90deg, var(--accent) 0%, #7c3aff 100%);
+  border-radius: 99px; transition: width 0.45s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── TODAY BANNER ── */
+.today-banner {
+  margin: 12px 14px 0;
+  background: linear-gradient(135deg, #3b5bff 0%, #7c3aff 100%);
+  border-radius: var(--radius); padding: 14px 14px 14px 14px;
+  display: none; align-items: flex-start; gap: 12px;
+  color: white; box-shadow: 0 4px 20px rgba(59,91,255,0.3);
+  animation: slideDown 0.3s cubic-bezier(.4,0,.2,1);
+}
+.today-banner.show { display: flex; }
+@keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+.today-banner-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+.today-banner-content { flex: 1; min-width: 0; }
+.today-banner-title {
+  font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.8; margin-bottom: 8px;
+}
+.today-banner-items { display: flex; flex-direction: column; gap: 4px; }
+.today-banner-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.today-banner-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.today-banner-amt  { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; flex-shrink: 0; opacity: 0.95; }
+.today-banner-total {
+  margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);
+  display: flex; justify-content: space-between;
+  font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+}
+.today-banner-close {
+  background: rgba(255,255,255,0.18); border: none; color: white;
+  width: 26px; height: 26px; border-radius: 50%; font-size: 16px;
+  cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.18s; margin-top: 1px;
+}
+.today-banner-close:active { background: rgba(255,255,255,0.35); }
+
+/* ── LIST ── */
+.list { padding: 12px 14px 0; display: flex; flex-direction: column; gap: 8px; }
+
+/* ── EMPTY ── */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 60px 30px 40px; text-align: center;
+}
+.empty-icon { font-size: 52px; margin-bottom: 16px; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.empty-title { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: var(--text); margin-bottom: 8px; }
+.empty-sub   { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 28px; }
+.btn-empty-add {
+  background: var(--accent); color: #fff; border: none; border-radius: 12px;
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 14px 28px; cursor: pointer; box-shadow: 0 4px 16px rgba(59,91,255,0.3); transition: all 0.2s;
+}
+.btn-empty-add:active { transform: scale(0.97); opacity: 0.9; }
+
+/* ── ITEM (normal) ── */
+.item {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  display: flex; align-items: center; gap: 12px; padding: 13px 14px;
+  cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+  user-select: none; box-shadow: var(--shadow);
+}
+.item:active { transform: scale(0.985); box-shadow: none; }
+.item.checked { background: #f9fafb; border-color: transparent; box-shadow: none; opacity: 0.6; }
+.item.checked .item-label { text-decoration: line-through; color: var(--text-muted); }
+.item.checked .amount    { color: var(--green); }
+.item.checked .day-badge { background: var(--green-dim); color: var(--green); }
+.item.next-up { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-soft), var(--shadow-md); }
+.item.due-today { border-color: rgba(245,158,11,0.5); box-shadow: 0 0 0 1px rgba(245,158,11,0.2), var(--shadow-md); }
+.item.due-today .day-badge { background: rgba(245,158,11,0.12); color: var(--orange); }
+
+.day-badge {
+  width: 40px; height: 40px; border-radius: 11px; background: var(--accent-dim);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700;
+  color: var(--accent); transition: all 0.2s;
+}
+.item-content { flex: 1; min-width: 0; }
+.item-label {
+  font-size: 14px; font-weight: 500; color: var(--text); transition: color 0.2s;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.amount { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: var(--text); flex-shrink: 0; transition: color 0.2s; }
+.check-icon {
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border2);
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; background: var(--surface2);
+}
+.item.checked .check-icon { border-color: var(--green); background: var(--green); }
+.check-icon svg { opacity: 0; transform: scale(0.4); transition: all 0.2s; }
+.item.checked .check-icon svg { opacity: 1; transform: scale(1); }
+.next-tag {
+  position: absolute; top: 7px; right: 9px;
+  font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; letter-spacing: 0.1em;
+  color: var(--accent); background: var(--accent-dim);
+  padding: 2px 6px; border-radius: 4px; border: 1px solid var(--accent-soft);
+}
+.today-tag {
+  position: absolute; top: 7px; right: 9px;
+  font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; letter-spacing: 0.1em;
+  color: var(--orange); background: rgba(245,158,11,0.12);
+  padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(245,158,11,0.3);
+}
+
+/* ── EDIT MODE ── */
+.item.edit-mode {
+  cursor: default; flex-direction: column; align-items: stretch;
+  gap: 10px; padding: 14px; border-color: var(--accent-soft); background: #fafbff;
+}
+.item.edit-mode:active { transform: none; }
+.edit-row    { display: flex; align-items: center; gap: 10px; }
+.edit-badge-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 4px; }
+.edit-input {
+  background: var(--surface); border: 1px solid var(--border2); border-radius: 9px; color: var(--text);
+  font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 500;
+  padding: 9px 11px; outline: none; width: 100%;
+  transition: border-color 0.18s; -webkit-appearance: none;
+}
+.edit-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.edit-actions { display: flex; gap: 8px; margin-top: 2px; }
+.btn-save {
+  flex: 1; background: var(--accent); color: #fff; border: none; border-radius: 9px;
+  font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 10px; cursor: pointer; transition: all 0.18s;
+}
+.btn-save:active { opacity: 0.8; transform: scale(0.97); }
+.btn-del {
+  background: var(--danger-dim); color: var(--danger);
+  border: 1px solid rgba(232,52,74,0.2); border-radius: 9px;
+  font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 10px 14px; cursor: pointer; transition: all 0.18s;
+}
+.btn-del:active { background: var(--danger); color: #fff; }
+
+/* ── FAB ── */
+.fab {
+  position: fixed; bottom: 24px; right: 18px;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-size: 28px; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(59,91,255,0.4); transition: all 0.2s; z-index: 200;
+}
+.fab:active { transform: scale(0.92); }
+.fab.hidden { display: none; }
+
+/* ── SHEET ── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(26,29,46,0.45);
+  backdrop-filter: blur(4px); z-index: 300;
+  display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+.sheet {
+  background: var(--surface); border-top: 1px solid var(--border);
+  border-radius: 22px 22px 0 0; padding: 22px 18px 44px; width: 100%;
+  transform: translateY(40px); transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 -4px 32px rgba(59,91,255,0.10);
+}
+.overlay.open .sheet { transform: translateY(0); }
+.sheet-handle { width: 40px; height: 4px; background: var(--border2); border-radius: 99px; margin: 0 auto 18px; }
+.sheet-title {
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 18px;
+}
+.field-group { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+.field-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-muted); margin-bottom: 5px; }
+.field-input {
+  background: var(--surface2); border: 1.5px solid var(--border); border-radius: 11px; color: var(--text);
+  font-family: 'Sora', sans-serif; font-size: 16px; padding: 13px 14px; width: 100%; outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none;
+}
+.field-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); background: var(--surface); }
+.field-input::placeholder { color: #b0b8d0; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.error-msg { font-size: 11px; color: var(--danger); margin-top: 4px; display: none; font-weight: 500; }
+.error-msg.show { display: block; }
+.btn-add {
+  width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 12px;
+  font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 15px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 16px rgba(59,91,255,0.25);
+}
+.btn-add:active { transform: scale(0.98); opacity: 0.9; }
+.btn-cancel {
+  width: 100%; background: none; color: var(--text-muted); border: 1.5px solid var(--border);
+  border-radius: 12px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+  padding: 12px; cursor: pointer; margin-top: 10px; transition: all 0.2s;
+}
+.btn-cancel:active { background: var(--surface2); }
+
+/* ── ALL DONE ── */
+.all-done { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 14px; }
+.all-done-icon { font-size: 44px; margin-bottom: 12px; display: block; }
+.all-done strong { color: var(--green); font-weight: 700; }
+.btn-reset-inline {
+  margin-top: 16px; display: inline-block; background: var(--surface2);
+  border: 1.5px solid var(--border2); color: var(--text-muted);
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 11px 20px; border-radius: 10px; cursor: pointer; transition: all 0.18s;
+}
+.btn-reset-inline:active { background: var(--border2); }
+</style>
+</head>
+<body>
+
+<!-- ══ LOADING ══ -->
+<div id="screen-loading">
+  <div class="spinner"></div>
+  <span class="loading-text">Connexion...</span>
+</div>
+
+<!-- ══ AUTH ══ -->
+<div id="screen-auth" style="display:none">
+  <div class="auth-logo">💳</div>
+  <div class="auth-headline">📅 Mes Prélèvements</div>
+  <p class="auth-sub">Suis tes prélèvements fixes<br>mois après mois</p>
+
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tab-login"    onclick="switchTab('login')">Connexion</div>
+      <div class="auth-tab"        id="tab-register" onclick="switchTab('register')">Créer un compte</div>
+    </div>
+    <div class="auth-fields">
+      <input class="auth-input" id="auth-email"    type="email"    placeholder="Adresse email"             autocomplete="email">
+      <div>
+        <input class="auth-input" id="auth-password"  type="password" placeholder="Mot de passe"             autocomplete="current-password" oninput="onPwdInput(this.value)">
+        <div class="pwd-strength" id="pwd-strength">
+          <div class="pwd-bar"><div class="pwd-fill"></div></div>
+          <span class="pwd-label"></span>
+        </div>
+      </div>
+      <input class="auth-input" id="auth-password2" type="password" placeholder="Confirmer le mot de passe" autocomplete="new-password" style="display:none">
+    </div>
+    <div class="auth-msg" id="auth-msg"></div>
+    <button class="btn-auth" id="btn-submit" onclick="submitAuth()">SE CONNECTER</button>
+    <div class="auth-forgot" id="auth-forgot" onclick="forgotPassword()">Mot de passe oublié ?</div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="screen-app" style="display:none">
+
+  <div class="header">
+    <div class="header-top">
+      <div class="header-left">
+        <span class="app-title">📅 Prélèvements</span>
+        <span class="user-label" id="userLabel"></span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn manage"     id="manageBtn"  onclick="toggleManage()">✏️ GÉRER</button>
+        <button class="icon-btn"                            onclick="resetAll()">RESET</button>
+        <button class="icon-btn logout-btn"                 onclick="logout()">⎋ DÉCO</button>
+      </div>
+    </div>
+    <div class="summary">
+      <div class="summary-cell"><span class="summary-value total"     id="totalVal">0,00 €</span><span class="summary-label">Total</span></div>
+      <div class="summary-cell"><span class="summary-value paid"      id="paidVal">0,00 €</span><span class="summary-label">Prélevé</span></div>
+      <div class="summary-cell"><span class="summary-value remaining" id="remainVal">0,00 €</span><span class="summary-label">Restant</span></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span class="progress-label">Progression du mois</span>
+        <span class="progress-pct" id="progressPct">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- BANNER RAPPEL DU JOUR -->
+  <div class="today-banner" id="today-banner">
+    <div class="today-banner-icon">🔔</div>
+    <div class="today-banner-content">
+      <div class="today-banner-title">Prélèvements prévus aujourd'hui</div>
+      <div class="today-banner-items" id="banner-items"></div>
+      <div class="today-banner-total" id="banner-total" style="display:none">
+        <span>Total du jour</span><span id="banner-total-amt"></span>
+      </div>
+    </div>
+    <button class="today-banner-close" onclick="dismissBanner()">×</button>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <button class="fab" id="fab" onclick="openSheet()">+</button>
+
+  <div class="overlay" id="overlay" onclick="handleOverlayClick(event)">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">+ Nouveau prélèvement</div>
+      <div class="field-group">
+        <div>
+          <div class="field-label">Libellé</div>
+          <input class="field-input" id="inp-label" type="text" placeholder="Ex : Loyer, EDF, Assurance…" maxlength="40">
+          <div class="error-msg" id="err-label">Libellé requis</div>
+        </div>
+        <div class="field-row">
+          <div>
+            <div class="field-label">Jour du mois</div>
+            <input class="field-input" id="inp-day" type="number" placeholder="1 – 31" min="1" max="31">
+            <div class="error-msg" id="err-day">Jour invalide (1–31)</div>
+          </div>
+          <div>
+            <div class="field-label">Montant (€)</div>
+            <input class="field-input" id="inp-amount" type="number" placeholder="0.00" min="0.01" step="0.01">
+            <div class="error-msg" id="err-amount">Montant invalide</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-add" onclick="confirmSheet()">AJOUTER</button>
+      <button class="btn-cancel" onclick="closeSheet()">ANNULER</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  FIREBASE INIT
+// ═══════════════════════════════════════════
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+// ── State ──
+let currentUser = null;
+let debits      = [];
+let checked     = [];
+let manageMode  = false;
+let authMode    = 'login';
+let bannerDismissedToday = null; // date string "D/M/YYYY"
+
+function showScreen(name) {
+  ['loading','auth','app'].forEach(s =>
+    document.getElementById('screen-' + s).style.display = s === name ? '' : 'none'
+  );
+}
+
+// ── Auth watcher ──
+auth.onAuthStateChanged(async user => {
+  if (user) {
+    currentUser = user;
+    await loadData();
+    showScreen('app');
+    render();
+    checkTodayDebits();
+    requestNotifPermission();
+  } else {
+    currentUser = null;
+    debits = []; checked = [];
+    showScreen('auth');
+  }
+});
+
+// ═══════════════════════════════════════════
+//  FIRESTORE
+// ═══════════════════════════════════════════
+async function loadData() {
+  try {
+    const doc = await db.collection('users').doc(currentUser.uid).get();
+    if (doc.exists) {
+      debits  = doc.data().debits  || [];
+      checked = doc.data().checked || [];
+    } else {
+      debits = []; checked = [];
+    }
+  } catch(e) { console.error('Erreur chargement:', e); }
+}
+
+async function saveData() {
+  if (!currentUser) return;
+  try {
+    await db.collection('users').doc(currentUser.uid).set({
+      debits, checked,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) { console.error('Erreur sauvegarde:', e); }
+}
+
+// ═══════════════════════════════════════════
+//  NOTIFICATIONS
+// ═══════════════════════════════════════════
+function checkTodayDebits() {
+  const today     = new Date().getDate();
+  const todayStr  = new Date().toLocaleDateString('fr-FR');
+  const todayList = debits.filter(d => d.day === today && !checked.includes(d.id));
+
+  const banner = document.getElementById('today-banner');
+
+  if (todayList.length === 0 || bannerDismissedToday === todayStr) {
+    banner.classList.remove('show');
+    return;
+  }
+
+  // Remplissage du banner
+  const itemsEl = document.getElementById('banner-items');
+  itemsEl.innerHTML = todayList.map(d =>
+    `<div class="today-banner-row">
+      <span class="today-banner-name">${d.label}</span>
+      <span class="today-banner-amt">${fmt(d.amount)}</span>
+    </div>`
+  ).join('');
+
+  // Total si plusieurs
+  const totalEl    = document.getElementById('banner-total');
+  const totalAmtEl = document.getElementById('banner-total-amt');
+  if (todayList.length > 1) {
+    const sum = todayList.reduce((s,d) => s + d.amount, 0);
+    totalAmtEl.textContent = fmt(sum);
+    totalEl.style.display = 'flex';
+  } else {
+    totalEl.style.display = 'none';
+  }
+
+  banner.classList.add('show');
+
+  // Notification navigateur si permission accordée
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const tag = 'prev-today-' + todayStr;
+    const body = todayList.map(d => `${d.label} : ${fmt(d.amount)}`).join('\n');
+    new Notification('🔔 Prélèvements du jour', { body, tag });
+  }
+}
+
+function dismissBanner() {
+  bannerDismissedToday = new Date().toLocaleDateString('fr-FR');
+  document.getElementById('today-banner').classList.remove('show');
+}
+
+async function requestNotifPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    // Délai de 3 s pour ne pas bombarder l'utilisateur à l'ouverture
+    setTimeout(() => Notification.requestPermission(), 3000);
+  }
+}
+
+// Vérif quand l'app reprend le focus (retour depuis autre onglet / lock screen)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && currentUser) checkTodayDebits();
+});
+
+// ═══════════════════════════════════════════
+//  AUTH UI
+// ═══════════════════════════════════════════
+function switchTab(tab) {
+  authMode = tab;
+  document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('auth-password2').style.display = tab === 'register' ? '' : 'none';
+  document.getElementById('btn-submit').textContent        = tab === 'login' ? 'SE CONNECTER' : 'CRÉER MON COMPTE';
+  document.getElementById('auth-forgot').style.display    = tab === 'login' ? '' : 'none';
+  const ps = document.getElementById('pwd-strength');
+  ps.classList.remove('show');
+  clearMsg();
+}
+
+// Force du mot de passe
+function onPwdInput(val) {
+  if (authMode !== 'register') return;
+  const ps  = document.getElementById('pwd-strength');
+  if (!val) { ps.classList.remove('show'); return; }
+  ps.classList.add('show');
+
+  let score = 0;
+  if (val.length >= 8)          score++;
+  if (val.length >= 12)         score++;
+  if (/[A-Z]/.test(val))        score++;
+  if (/[0-9]/.test(val))        score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+
+  const level = score <= 1 ? 1 : score <= 2 ? 2 : score <= 3 ? 3 : 4;
+  const labels = ['', 'Faible', 'Moyen', 'Bon', 'Fort ✓'];
+  ps.className = `pwd-strength show str-${level}`;
+  ps.querySelector('.pwd-label').textContent = labels[level];
+}
+
+function showMsg(text, type = 'error') {
+  const el = document.getElementById('auth-msg');
+  el.textContent = text; el.className = 'auth-msg ' + type; el.style.display = 'block';
+}
+function clearMsg() {
+  const el = document.getElementById('auth-msg'); el.style.display = 'none';
+}
+
+const ERR = {
+  'auth/wrong-password':         'Email ou mot de passe incorrect',
+  'auth/invalid-credential':     'Email ou mot de passe incorrect',
+  'auth/user-not-found':         'Aucun compte avec cet email',
+  'auth/email-already-in-use':   'Email déjà utilisé',
+  'auth/weak-password':          'Mot de passe trop court (6 caractères min.)',
+  'auth/invalid-email':          'Adresse email invalide',
+  'auth/too-many-requests':      'Trop de tentatives, réessaie plus tard',
+  'auth/network-request-failed': 'Erreur réseau',
+};
+
+async function submitAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-password').value;
+  const pass2 = document.getElementById('auth-password2').value;
+  const btn   = document.getElementById('btn-submit');
+  clearMsg();
+
+  if (!email || !pass) { showMsg('Remplis tous les champs'); return; }
+
+  if (authMode === 'register') {
+    if (pass !== pass2)  { showMsg('Les mots de passe ne correspondent pas'); return; }
+    if (pass.length < 6) { showMsg('Mot de passe trop court (6 caractères min.)'); return; }
+    try {
+      btn.disabled = true;
+      await auth.createUserWithEmailAndPassword(email, pass);
+    } catch(e) { showMsg(ERR[e.code] || e.message); btn.disabled = false; }
+  } else {
+    try {
+      btn.disabled = true;
+      await auth.signInWithEmailAndPassword(email, pass);
+    } catch(e) { showMsg(ERR[e.code] || e.message); btn.disabled = false; }
+  }
+}
+
+async function forgotPassword() {
+  const email = document.getElementById('auth-email').value.trim();
+  if (!email) { showMsg('Saisis d\'abord ton email'); return; }
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showMsg('Email de réinitialisation envoyé ✓', 'success');
+  } catch(e) { showMsg(ERR[e.code] || e.message); }
+}
+
+async function logout() { manageMode = false; await auth.signOut(); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('screen-auth').style.display !== 'none') submitAuth();
+});
+
+// ═══════════════════════════════════════════
+//  APP LOGIC
+// ═══════════════════════════════════════════
+function fmt(v) { return v.toFixed(2).replace('.', ',') + '\u202f€'; }
+function nextId() { return debits.length ? Math.max(...debits.map(d => d.id)) + 1 : 1; }
+function getNextDay() {
+  const today = new Date().getDate();
+  const up = debits.filter(d => !checked.includes(d.id) && d.day >= today).sort((a,b) => a.day - b.day);
+  return up.length ? up[0].day : null;
+}
+
+function render() {
+  const total   = debits.reduce((s,d) => s + d.amount, 0);
+  const paidSum = debits.filter(d => checked.includes(d.id)).reduce((s,d) => s + d.amount, 0);
+  const remain  = total - paidSum;
+  const pct     = total > 0 ? Math.round((paidSum / total) * 100) : 0;
+  const today   = new Date().getDate();
+  const nextDay = getNextDay();
+  const monthStr = new Date().toLocaleDateString('fr-FR', {month:'long', year:'numeric'}).toUpperCase();
+
+  if (currentUser) {
+    document.getElementById('userLabel').textContent =
+      currentUser.email.split('@')[0] + ' · ' + monthStr;
+  }
+  document.getElementById('totalVal').textContent    = fmt(total);
+  document.getElementById('paidVal').textContent     = fmt(paidSum);
+  document.getElementById('remainVal').textContent   = fmt(remain);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent  = pct + '%';
+
+  const btn = document.getElementById('manageBtn');
+  btn.textContent = manageMode ? '✅ TERMINER' : '✏️ GÉRER';
+  btn.classList.toggle('active', manageMode);
+  document.getElementById('fab').className = manageMode ? 'fab hidden' : 'fab';
+
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+
+  if (debits.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-icon">💳</span>
+        <div class="empty-title">Aucun prélèvement</div>
+        <p class="empty-sub">Appuie sur <strong>+</strong> pour ajouter<br>ton premier prélèvement fixe.</p>
+        <button class="btn-empty-add" onclick="openSheet()">+ Ajouter un prélèvement</button>
+      </div>`;
+    return;
+  }
+
+  if (!manageMode && debits.length > 0 && checked.length === debits.length) {
+    list.innerHTML = `
+      <div class="all-done">
+        <span class="all-done-icon">🎉</span>
+        <strong>Tous les prélèvements sont passés !</strong><br>Bonne fin de mois 💸<br>
+        <button class="btn-reset-inline" onclick="resetAll()">↺ Tout remettre à zéro</button>
+      </div>`;
+    return;
+  }
+
+  [...debits].sort((a,b) => a.day - b.day).forEach(d => {
+    const isChecked  = !manageMode && checked.includes(d.id);
+    const isToday    = !manageMode && !isChecked && d.day === today;
+    const isNext     = !manageMode && !isChecked && !isToday && d.day === nextDay;
+    const item       = document.createElement('div');
+
+    if (manageMode) {
+      item.className = 'item edit-mode';
+      item.innerHTML = `
+        <div class="edit-row"><div style="flex:1">
+          <div class="edit-badge-label">Libellé</div>
+          <input class="edit-input" data-field="label" value="${d.label}" maxlength="40">
+        </div></div>
+        <div class="edit-row">
+          <div style="flex:1">
+            <div class="edit-badge-label">Jour</div>
+            <input class="edit-input" data-field="day" type="number" min="1" max="31" value="${d.day}">
+          </div>
+          <div style="flex:1">
+            <div class="edit-badge-label">Montant (€)</div>
+            <input class="edit-input" data-field="amount" type="number" min="0.01" step="0.01" value="${d.amount}">
+          </div>
+        </div>
+        <div class="edit-actions">
+          <button class="btn-save">💾 ENREGISTRER</button>
+          <button class="btn-del">🗑</button>
+        </div>`;
+      item.querySelector('.btn-save').addEventListener('click', () => saveInline(d.id, item));
+      item.querySelector('.btn-del').addEventListener('click',  () => deleteDebit(d.id));
+    } else {
+      item.className = 'item'
+        + (isChecked ? ' checked' : '')
+        + (isToday   ? ' due-today' : '')
+        + (isNext    ? ' next-up'   : '');
+      item.innerHTML = `
+        ${isToday ? '<span class="today-tag">AUJOURD\'HUI</span>' : ''}
+        ${isNext  ? '<span class="next-tag">PROCHAIN</span>'      : ''}
+        <div class="day-badge">${String(d.day).padStart(2,'0')}</div>
+        <div class="item-content"><div class="item-label">${d.label}</div></div>
+        <div class="amount">${fmt(d.amount)}</div>
+        <div class="check-icon">
+          <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+            <path d="M1.5 5l3 3 6-6" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>`;
+      item.addEventListener('click', () => toggle(d.id));
+    }
+    list.appendChild(item);
+  });
+}
+
+function saveInline(id, item) {
+  const lv = item.querySelector('[data-field="label"]').value.trim();
+  const dv = parseInt(item.querySelector('[data-field="day"]').value);
+  const av = parseFloat(item.querySelector('[data-field="amount"]').value);
+  if (!lv || isNaN(dv) || dv < 1 || dv > 31 || isNaN(av) || av <= 0) {
+    item.style.borderColor = 'var(--danger)';
+    setTimeout(() => item.style.borderColor = '', 1200);
+    return;
+  }
+  const idx = debits.findIndex(d => d.id === id);
+  if (idx === -1) return;
+  debits[idx] = { ...debits[idx], label: lv, day: dv, amount: Math.round(av * 100) / 100 };
+  saveData(); render(); checkTodayDebits();
+}
+
+function toggle(id) {
+  if (checked.includes(id)) checked = checked.filter(x => x !== id);
+  else checked.push(id);
+  saveData(); render(); checkTodayDebits();
+}
+
+function deleteDebit(id) {
+  debits  = debits.filter(d => d.id !== id);
+  checked = checked.filter(x => x !== id);
+  saveData(); render(); checkTodayDebits();
+}
+
+function toggleManage() { manageMode = !manageMode; render(); }
+function resetAll()     { checked = []; saveData(); render(); checkTodayDebits(); }
+
+function openSheet() {
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(() => document.getElementById('inp-label').focus(), 300);
+}
+function closeSheet() {
+  document.getElementById('overlay').classList.remove('open');
+  ['inp-label','inp-day','inp-amount'].forEach(id => document.getElementById(id).value = '');
+  ['err-label','err-day','err-amount'].forEach(id => document.getElementById(id).classList.remove('show'));
+}
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closeSheet();
+}
+function confirmSheet() {
+  const label  = document.getElementById('inp-label').value.trim();
+  const day    = parseInt(document.getElementById('inp-day').value);
+  const amount = parseFloat(document.getElementById('inp-amount').value);
+  let ok = true;
+  const err = (id, show) => { document.getElementById(id).classList.toggle('show', show); if (show) ok = false; };
+  err('err-label',  !label);
+  err('err-day',    isNaN(day)    || day < 1    || day > 31);
+  err('err-amount', isNaN(amount) || amount <= 0);
+  if (!ok) return;
+  debits.push({ id: nextId(), day, label, amount: Math.round(amount * 100) / 100 });
+  saveData(); render(); closeSheet(); checkTodayDebits();
+}
+</script>
+</body>
+</html>
