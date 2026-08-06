@@ -7,51 +7,44 @@
 <meta name="theme-color" content="#3b5bff">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Mon Foyer">
 <link rel="manifest" href="manifest.json">
-
 <script>
 const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyAkLTdnYE3NE10sOO8AO6sr5_hbg3nfoqs",
-  authDomain:        "prelevement-c4a9b.firebaseapp.com",
-  projectId:         "prelevement-c4a9b",
-  storageBucket:     "prelevement-c4a9b.firebasestorage.app",
-  messagingSenderId: "451068858985",
-  appId:             "1:451068858985:web:4c3fdeb92f82b100f548f8"
+  apiKey:"AIzaSyAkLTdnYE3NE10sOO8AO6sr5_hbg3nfoqs",
+  authDomain:"prelevement-c4a9b.firebaseapp.com",
+  projectId:"prelevement-c4a9b",
+  storageBucket:"prelevement-c4a9b.firebasestorage.app",
+  messagingSenderId:"451068858985",
+  appId:"1:451068858985:web:4c3fdeb92f82b100f548f8"
 };
 </script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
-
-:root {
-  --bg:#f4f6fa; --surface:#fff; --surface2:#f0f2f7;
-  --border:#e2e6f0; --border2:#cdd3e2;
-  --accent:#3b5bff; --accent-dim:rgba(59,91,255,.08); --accent-soft:rgba(59,91,255,.15);
-  --text:#1a1d2e; --text-muted:#7880a0;
-  --danger:#e8344a; --danger-dim:rgba(232,52,74,.10);
-  --green:#12b76a; --green-dim:rgba(18,183,106,.10);
-  --orange:#f59e0b;
-  --purple:#7c3aff; --purple-dim:rgba(124,58,255,.08);
-  --teal:#0ea5e9; --teal-dim:rgba(14,165,233,.10);
-  --radius:14px;
-  --shadow:0 2px 12px rgba(59,91,255,.07);
-  --shadow-md:0 4px 24px rgba(59,91,255,.13);
+:root{
+  --bg:#f4f6fa;--surface:#fff;--surface2:#f0f2f7;
+  --border:#e2e6f0;--border2:#cdd3e2;
+  --accent:#3b5bff;--accent-dim:rgba(59,91,255,.08);--accent-soft:rgba(59,91,255,.15);
+  --text:#1a1d2e;--text-muted:#7880a0;
+  --danger:#e8344a;--danger-dim:rgba(232,52,74,.10);
+  --green:#12b76a;--green-dim:rgba(18,183,106,.10);
+  --orange:#f59e0b;--purple:#7c3aff;--purple-dim:rgba(124,58,255,.08);
+  --teal:#0ea5e9;--teal-dim:rgba(14,165,233,.10);
+  --radius:14px;--shadow:0 2px 12px rgba(59,91,255,.07);--shadow-md:0 4px 24px rgba(59,91,255,.13);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
-/* ── LOADING ── */
+/* LOADING */
 #screen-loading{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 .spinner{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--text-muted)}
 
-/* ── AUTH ── */
+/* AUTH */
 #screen-auth{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 18px 48px}
 .auth-logo{font-size:50px;text-align:center;margin-bottom:6px}
 .auth-headline{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);text-align:center;margin-bottom:4px}
@@ -78,10 +71,10 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .btn-auth:active{transform:scale(.98)}.btn-auth:disabled{opacity:.55;cursor:not-allowed}
 .auth-forgot{text-align:center;margin-top:14px;font-size:12px;color:var(--text-muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 
-/* ── APP SHELL ── */
+/* APP SHELL */
 #screen-app{min-height:100vh;padding-bottom:148px}
 
-/* ── HEADER ── */
+/* HEADER */
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 18px 0;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
 .header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:6px}
 .header-left{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -95,7 +88,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .icon-btn.foyer-btn{background:var(--purple-dim);border-color:rgba(124,58,255,.2);color:var(--purple)}
 .icon-btn.logout-btn{background:var(--danger-dim);border-color:rgba(232,52,74,.2);color:var(--danger)}
 
-/* ── SUMMARY ── */
+/* SUMMARY */
 .summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border-top:1px solid var(--border);margin:0 -18px}
 .summary-cell{background:var(--surface);padding:10px 8px 12px;text-align:center}
 .summary-value{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;display:block;margin-bottom:2px}
@@ -108,33 +101,37 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .progress-track{height:5px;background:var(--surface2);border-radius:99px;overflow:hidden;border:1px solid var(--border)}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:99px;transition:width .45s cubic-bezier(.4,0,.2,1)}
 
-/* ── BOTTOM TAB BAR ── */
+/* BOTTOM TABS */
 .bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;z-index:150;box-shadow:0 -2px 16px rgba(59,91,255,.07)}
-.tab-btn{display:flex;flex-direction:column;align-items:center;padding:10px 0 18px;gap:3px;background:none;border:none;cursor:pointer;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);transition:color .18s;position:relative}
+.tab-btn{display:flex;flex-direction:column;align-items:center;padding:10px 0 18px;gap:3px;background:none;border:none;cursor:pointer;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);transition:color .18s}
 .tab-btn.active{color:var(--accent)}
 .tab-icon{font-size:22px}
 .tab-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0;transition:opacity .18s;margin-top:1px}
 .tab-btn.active .tab-dot{opacity:1}
 
-/* ── FAB ── */
+/* FAB */
 .fab{position:fixed;bottom:88px;right:18px;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#fff;font-size:28px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(59,91,255,.4);transition:all .2s;z-index:200}
 .fab:active{transform:scale(.92)}.fab.hidden{display:none}
 .fab.teal{background:var(--teal);box-shadow:0 4px 20px rgba(14,165,233,.4)}
 
-/* ── TODAY BANNER ── */
+/* EXIT TOAST */
+.exit-toast{position:fixed;bottom:92px;left:50%;transform:translateX(-50%);background:rgba(26,29,46,.92);color:#fff;padding:11px 20px;border-radius:99px;font-size:13px;font-weight:500;z-index:600;pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap}
+.exit-toast.show{opacity:1}
+
+/* TODAY BANNER */
 .today-banner{margin:12px 14px 0;background:linear-gradient(135deg,#3b5bff,#7c3aff);border-radius:var(--radius);padding:14px;display:none;align-items:flex-start;gap:12px;color:#fff;box-shadow:0 4px 20px rgba(59,91,255,.3);animation:slideDown .3s cubic-bezier(.4,0,.2,1)}
 .today-banner.show{display:flex}
 @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.today-banner-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+.today-banner-icon{font-size:22px;flex-shrink:0}
 .today-banner-content{flex:1;min-width:0}
 .today-banner-title{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.8;margin-bottom:8px}
-.today-banner-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.today-banner-row{display:flex;justify-content:space-between;gap:8px}
 .today-banner-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .today-banner-amt{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;flex-shrink:0}
 .today-banner-total{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.2);display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:12px;font-weight:700}
 .today-banner-close{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 
-/* ── DÉPENSES LIST ── */
+/* DÉPENSES LIST */
 .list{padding:12px 14px 0;display:flex;flex-direction:column;gap:8px}
 .item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;user-select:none;box-shadow:var(--shadow)}
 .item:active{transform:scale(.985);box-shadow:none}
@@ -160,16 +157,14 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .edit-input{background:var(--surface);border:1px solid var(--border2);border-radius:9px;color:var(--text);font-family:'Sora',sans-serif;font-size:14px;font-weight:500;padding:9px 11px;outline:none;width:100%;transition:border-color .18s;-webkit-appearance:none}
 .edit-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
 .edit-actions{display:flex;gap:8px;margin-top:2px}
-.btn-save{flex:1;background:var(--accent);color:#fff;border:none;border-radius:9px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.08em;padding:10px;cursor:pointer;transition:all .18s}
-.btn-save:active{opacity:.8}
-.btn-del{background:var(--danger-dim);color:var(--danger);border:1px solid rgba(232,52,74,.2);border-radius:9px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.08em;padding:10px 14px;cursor:pointer;transition:all .18s}
+.btn-save{flex:1;background:var(--accent);color:#fff;border:none;border-radius:9px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.08em;padding:10px;cursor:pointer}
+.btn-del{background:var(--danger-dim);color:var(--danger);border:1px solid rgba(232,52,74,.2);border-radius:9px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.08em;padding:10px 14px;cursor:pointer}
 .btn-del:active{background:var(--danger);color:#fff}
 
-/* ── COURSES VIEW ── */
+/* COURSES VIEW */
 #view-courses{padding-bottom:8px}
 .courses-toolbar{display:flex;gap:8px;padding:12px 14px 0;justify-content:space-between;align-items:center}
-.courses-toolbar-left{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:500}
-.courses-toolbar-right{display:flex;gap:7px}
+.courses-count{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:500}
 .course-list{padding:10px 14px 0}
 .cat-section{margin-bottom:16px}
 .cat-header{display:flex;align-items:center;gap:8px;padding:6px 4px;margin-bottom:7px;border-bottom:2px solid var(--border)}
@@ -189,28 +184,45 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .courses-empty{text-align:center;padding:50px 30px 40px;color:var(--text-muted)}
 .courses-empty-icon{font-size:48px;margin-bottom:14px;display:block;animation:float 3s ease-in-out infinite}
 
-/* ── CAT CHIPS (add course sheet) ── */
-.cat-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:220px;overflow-y:auto;padding-right:2px}
+/* EMOJI PICKER */
+.emoji-section{margin-bottom:14px}
+.emoji-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-muted);margin-bottom:8px}
+.emoji-row{display:flex;overflow-x:auto;gap:4px;padding:4px 0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.emoji-row::-webkit-scrollbar{display:none}
+.emoji-btn{font-size:24px;background:none;border:2px solid transparent;cursor:pointer;padding:4px 5px;border-radius:9px;flex-shrink:0;transition:all .15s;line-height:1}
+.emoji-btn.sel{background:var(--teal-dim);border-color:var(--teal)}
+.emoji-btn:active{background:var(--surface2)}
+
+/* CAT CHIPS */
+.cat-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:200px;overflow-y:auto}
 .cat-chip{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:10px 8px;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;transition:all .18s;text-align:center}
 .cat-chip.sel{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);font-weight:700}
 .cat-chip:active{transform:scale(.97)}
 
-/* ── CAT MANAGE ── */
+/* CAT MANAGE — DRAG & DROP */
 .cat-manage-list{display:flex;flex-direction:column;gap:7px;max-height:320px;overflow-y:auto;margin-bottom:14px}
-.cat-manage-item{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.cat-manage-item{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;transition:all .2s;touch-action:none}
+.cat-manage-item.dragging{opacity:.6;background:var(--accent-dim);border-color:var(--accent);box-shadow:var(--shadow-md);transform:scale(1.02)}
+.cat-manage-item.drop-above{border-top:2px solid var(--accent)}
+.cat-manage-item.drop-below{border-bottom:2px solid var(--accent)}
+.drag-handle{color:var(--border2);font-size:20px;cursor:grab;padding:2px 4px;flex-shrink:0;user-select:none;letter-spacing:-2px}
 .cat-manage-name{flex:1;font-size:13px;font-weight:500}
-.cat-move-btn{background:none;border:1px solid var(--border);color:var(--text-muted);width:30px;height:30px;border-radius:7px;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;flex-shrink:0}
-.cat-move-btn:active{background:var(--surface)}.cat-move-btn:disabled{opacity:.3;cursor:default}
 .cat-del-btn{background:var(--danger-dim);border:1px solid rgba(232,52,74,.2);color:var(--danger);width:30px;height:30px;border-radius:7px;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
 .cat-del-btn:active{background:var(--danger);color:#fff}
 .add-cat-row{display:flex;gap:8px;margin-bottom:16px}
 .btn-add-cat{background:var(--accent);color:#fff;border:none;border-radius:10px;width:48px;height:48px;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(59,91,255,.25)}
 .btn-add-cat:active{transform:scale(.95)}
 
-/* ── OVERLAYS & SHEETS ── */
+/* AUTO-LOGOUT SETTINGS */
+.logout-opts{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.logout-opt{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.06em;padding:7px 12px;cursor:pointer;transition:all .18s;color:var(--text-muted)}
+.logout-opt.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.logout-opt:active{transform:scale(.97)}
+
+/* OVERLAYS & SHEETS */
 .overlay{position:fixed;inset:0;background:rgba(26,29,46,.45);backdrop-filter:blur(4px);z-index:300;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
 .overlay.open{opacity:1;pointer-events:all}
-.sheet{background:var(--surface);border-top:1px solid var(--border);border-radius:22px 22px 0 0;padding:22px 18px 44px;width:100%;transform:translateY(40px);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:0 -4px 32px rgba(59,91,255,.10)}
+.sheet{background:var(--surface);border-top:1px solid var(--border);border-radius:22px 22px 0 0;padding:22px 18px 44px;width:100%;transform:translateY(40px);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:0 -4px 32px rgba(59,91,255,.10);max-height:90vh;overflow-y:auto}
 .overlay.open .sheet{transform:translateY(0)}
 .sheet-handle{width:40px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px}
 .sheet-title{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
@@ -228,12 +240,12 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .btn-cancel{width:100%;background:none;color:var(--text-muted);border:1.5px solid var(--border);border-radius:12px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;padding:12px;cursor:pointer;margin-top:10px;transition:all .2s}
 .btn-cancel:active{background:var(--surface2)}
 
-/* ── FOYER SHEET ── */
+/* FOYER SHEET */
 .foyer-section{margin-bottom:20px}
 .foyer-section-title{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px}
 .code-box{background:var(--surface2);border:1.5px solid var(--border2);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .code-value{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;letter-spacing:.2em;color:var(--purple)}
-.btn-copy{background:var(--purple-dim);border:1px solid rgba(124,58,255,.2);color:var(--purple);border-radius:8px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.08em;padding:8px 12px;cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn-copy{background:var(--purple-dim);border:1px solid rgba(124,58,255,.2);color:var(--purple);border-radius:8px;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.08em;padding:8px 12px;cursor:pointer;white-space:nowrap}
 .btn-copy:active{background:var(--purple);color:#fff}
 .code-hint{font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.5}
 .btn-share-link{width:100%;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;border:none;border-radius:12px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;padding:14px;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(124,58,255,.3);margin:10px 0;display:block}
@@ -246,56 +258,52 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .member-you{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--green);background:var(--green-dim);padding:2px 6px;border-radius:4px;flex-shrink:0}
 .join-row{display:flex;gap:8px}
 .join-row .field-input{flex:1;font-size:18px;letter-spacing:.15em;text-transform:uppercase}
-.btn-join{background:var(--purple);color:#fff;border:none;border-radius:11px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.06em;padding:0 16px;cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn-join{background:var(--purple);color:#fff;border:none;border-radius:11px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.06em;padding:0 16px;cursor:pointer;white-space:nowrap}
 .btn-join:active{opacity:.8}
 .share-msg{font-size:12px;font-weight:500;padding:9px 12px;border-radius:9px;margin-top:10px;display:none}
 .share-msg.error{color:var(--danger);background:var(--danger-dim)}.share-msg.success{color:var(--green);background:var(--green-dim)}
-.btn-leave{width:100%;background:none;color:var(--danger);border:1px solid rgba(232,52,74,.25);border-radius:12px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.08em;padding:12px;cursor:pointer;margin-top:6px;transition:all .2s}
+.btn-leave{width:100%;background:none;color:var(--danger);border:1px solid rgba(232,52,74,.25);border-radius:12px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.08em;padding:12px;cursor:pointer;margin-top:6px}
 .btn-leave:active{background:var(--danger-dim)}
 
-/* ── INVITE ── */
+/* INVITE */
 .invite-box{text-align:center;padding:16px 0 20px}
 .invite-icon-big{font-size:52px;margin-bottom:14px;display:block}
 .invite-text{font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:18px}
 .invite-code-preview{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;letter-spacing:.22em;color:var(--purple);background:var(--purple-dim);border:1.5px solid rgba(124,58,255,.2);padding:12px 24px;border-radius:12px;display:inline-block}
 
-/* ── EMPTY & ALL DONE ── */
+/* EMPTY & DONE */
 .empty-state{display:flex;flex-direction:column;align-items:center;padding:60px 30px 40px;text-align:center}
 .empty-icon{font-size:52px;margin-bottom:16px;animation:float 3s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .empty-title{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--text);margin-bottom:8px}
 .empty-sub{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:28px}
-.btn-empty-add{background:var(--accent);color:#fff;border:none;border-radius:12px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;padding:14px 28px;cursor:pointer;box-shadow:0 4px 16px rgba(59,91,255,.3);transition:all .2s}
+.btn-empty-add{background:var(--accent);color:#fff;border:none;border-radius:12px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;padding:14px 28px;cursor:pointer;box-shadow:0 4px 16px rgba(59,91,255,.3)}
 .btn-empty-add:active{transform:scale(.97)}
 .all-done{text-align:center;padding:48px 20px;color:var(--text-muted);font-size:14px}
 .all-done-icon{font-size:44px;margin-bottom:12px;display:block}
 .all-done strong{color:var(--green);font-weight:700}
-.btn-reset-inline{margin-top:16px;display:inline-block;background:var(--surface2);border:1.5px solid var(--border2);color:var(--text-muted);font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;padding:11px 20px;border-radius:10px;cursor:pointer;transition:all .18s}
+.btn-reset-inline{margin-top:16px;display:inline-block;background:var(--surface2);border:1.5px solid var(--border2);color:var(--text-muted);font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;padding:11px 20px;border-radius:10px;cursor:pointer}
 .btn-reset-inline:active{background:var(--border2)}
 </style>
 </head>
 <body>
 
-<!-- ══ LOADING ══ -->
-<div id="screen-loading">
-  <div class="spinner"></div>
-  <span class="loading-text">Chargement...</span>
-</div>
+<div id="screen-loading"><div class="spinner"></div><span class="loading-text">Chargement...</span></div>
 
-<!-- ══ AUTH ══ -->
+<!-- AUTH -->
 <div id="screen-auth" style="display:none">
   <div class="auth-logo">🏠</div>
   <div class="auth-headline">Mon Foyer</div>
-  <p class="auth-sub" id="auth-sub">Prélèvements & courses<br>partagés avec ta famille</p>
+  <p class="auth-sub" id="auth-sub">Prélèvements & courses partagés</p>
   <div class="auth-card">
     <div class="auth-tabs">
-      <div class="auth-tab active" id="tab-login"    onclick="switchTab('login')">Connexion</div>
-      <div class="auth-tab"        id="tab-register" onclick="switchTab('register')">Créer un compte</div>
+      <div class="auth-tab active" id="tab-login"    onclick="switchAuthTab('login')">Connexion</div>
+      <div class="auth-tab"        id="tab-register" onclick="switchAuthTab('register')">Créer un compte</div>
     </div>
     <div class="auth-fields">
       <input class="auth-input" id="auth-email"     type="email"    placeholder="Adresse email" autocomplete="email">
       <div>
-        <input class="auth-input" id="auth-password"  type="password" placeholder="Mot de passe" autocomplete="current-password" oninput="onPwdInput(this.value)">
+        <input class="auth-input" id="auth-password" type="password" placeholder="Mot de passe" autocomplete="current-password" oninput="onPwdInput(this.value)">
         <div class="pwd-strength" id="pwd-strength"><div class="pwd-bar"><div class="pwd-fill"></div></div><span class="pwd-label"></span></div>
       </div>
       <input class="auth-input" id="auth-password2" type="password" placeholder="Confirmer le mot de passe" autocomplete="new-password" style="display:none">
@@ -306,10 +314,8 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
   </div>
 </div>
 
-<!-- ══ APP ══ -->
+<!-- APP -->
 <div id="screen-app" style="display:none">
-
-  <!-- HEADER -->
   <div class="header">
     <div class="header-top">
       <div class="header-left">
@@ -317,17 +323,16 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
         <span class="user-label" id="userLabel"></span>
       </div>
       <div class="header-actions">
-        <button class="icon-btn foyer-btn"  onclick="openFoyerSheet()">👨‍👩 FOYER</button>
+        <button class="icon-btn foyer-btn"             onclick="openFoyerSheet()">👨‍👩 FOYER</button>
         <button class="icon-btn manage" id="manageBtn" onclick="toggleManage()" style="display:none">✏️ GÉRER</button>
-        <button class="icon-btn" id="resetBtn" onclick="resetAll()" style="display:none">RESET</button>
-        <button class="icon-btn logout-btn" onclick="logout()">⎋</button>
+        <button class="icon-btn"        id="resetBtn"  onclick="resetAll()" style="display:none">RESET</button>
+        <button class="icon-btn logout-btn"            onclick="logout()">⎋</button>
       </div>
     </div>
-    <!-- Summary (dépenses only) -->
     <div id="summary-block">
       <div class="summary">
-        <div class="summary-cell"><span class="summary-value total" id="totalVal">0,00 €</span><span class="summary-label">Total</span></div>
-        <div class="summary-cell"><span class="summary-value paid" id="paidVal">0,00 €</span><span class="summary-label">Prélevé</span></div>
+        <div class="summary-cell"><span class="summary-value total"     id="totalVal">0,00 €</span><span class="summary-label">Total</span></div>
+        <div class="summary-cell"><span class="summary-value paid"      id="paidVal">0,00 €</span><span class="summary-label">Prélevé</span></div>
         <div class="summary-cell"><span class="summary-value remaining" id="remainVal">0,00 €</span><span class="summary-label">Restant</span></div>
       </div>
       <div class="progress-wrap">
@@ -337,7 +342,6 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
     </div>
   </div>
 
-  <!-- TODAY BANNER -->
   <div class="today-banner" id="today-banner">
     <div class="today-banner-icon">🔔</div>
     <div class="today-banner-content">
@@ -348,16 +352,12 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
     <button class="today-banner-close" onclick="dismissBanner()">×</button>
   </div>
 
-  <!-- VIEW : DÉPENSES -->
-  <div id="view-depenses">
-    <div class="list" id="list"></div>
-  </div>
+  <div id="view-depenses"><div class="list" id="list"></div></div>
 
-  <!-- VIEW : COURSES -->
   <div id="view-courses" style="display:none">
     <div class="courses-toolbar">
-      <span class="courses-toolbar-left" id="courses-count"></span>
-      <div class="courses-toolbar-right">
+      <span class="courses-count" id="courses-count"></span>
+      <div style="display:flex;gap:7px">
         <button class="icon-btn" onclick="openCatManage()">⚙️ RAYONS</button>
         <button class="icon-btn" onclick="clearDoneCourses()">🗑 VIDER ✓</button>
       </div>
@@ -365,20 +365,14 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
     <div class="course-list" id="course-list"></div>
   </div>
 
-  <!-- BOTTOM TABS -->
   <div class="bottom-tabs">
-    <button class="tab-btn active" data-tab="depenses" onclick="setTab('depenses')">
-      <span class="tab-icon">📅</span>DÉPENSES<div class="tab-dot"></div>
-    </button>
-    <button class="tab-btn" data-tab="courses" onclick="setTab('courses')">
-      <span class="tab-icon">🛒</span>COURSES<div class="tab-dot"></div>
-    </button>
+    <button class="tab-btn active" data-tab="depenses" onclick="setTab('depenses')"><span class="tab-icon">📅</span>DÉPENSES<div class="tab-dot"></div></button>
+    <button class="tab-btn"        data-tab="courses"  onclick="setTab('courses')"><span class="tab-icon">🛒</span>COURSES<div class="tab-dot"></div></button>
   </div>
 
-  <!-- FAB -->
   <button class="fab" id="fab" onclick="fabAction()">+</button>
 
-  <!-- OVERLAY: ADD DEBIT -->
+  <!-- ADD DEBIT -->
   <div class="overlay" id="overlay" onclick="if(event.target===this)closeSheet()">
     <div class="sheet">
       <div class="sheet-handle"></div>
@@ -390,16 +384,8 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
           <div class="error-msg" id="err-label">Libellé requis</div>
         </div>
         <div class="field-row">
-          <div>
-            <div class="field-label">Jour du mois</div>
-            <input class="field-input" id="inp-day" type="number" placeholder="1 – 31" min="1" max="31">
-            <div class="error-msg" id="err-day">Jour invalide</div>
-          </div>
-          <div>
-            <div class="field-label">Montant (€)</div>
-            <input class="field-input" id="inp-amount" type="number" placeholder="0.00" min="0.01" step="0.01">
-            <div class="error-msg" id="err-amount">Montant invalide</div>
-          </div>
+          <div><div class="field-label">Jour du mois</div><input class="field-input" id="inp-day" type="number" placeholder="1 – 31" min="1" max="31"><div class="error-msg" id="err-day">Jour invalide</div></div>
+          <div><div class="field-label">Montant (€)</div><input class="field-input" id="inp-amount" type="number" placeholder="0.00" min="0.01" step="0.01"><div class="error-msg" id="err-amount">Montant invalide</div></div>
         </div>
       </div>
       <button class="btn-add" onclick="confirmSheet()">AJOUTER</button>
@@ -407,15 +393,19 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
     </div>
   </div>
 
-  <!-- OVERLAY: ADD COURSE -->
+  <!-- ADD COURSE -->
   <div class="overlay" id="course-overlay" onclick="if(event.target===this)closeCourseSheet()">
     <div class="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-title teal">🛒 Ajouter un article</div>
+      <div class="emoji-section">
+        <div class="emoji-section-label">Icône rapide</div>
+        <div class="emoji-row" id="emoji-row"></div>
+      </div>
       <div class="field-group">
         <div>
           <div class="field-label">Nom du produit</div>
-          <input class="field-input" id="course-name" type="text" placeholder="Ex : Yaourts, Pâtes, Shampooing…" maxlength="50">
+          <input class="field-input" id="course-name" type="text" placeholder="Ex : Pain de mie, Yaourts…" maxlength="50">
           <div class="error-msg" id="err-course-name">Nom requis</div>
         </div>
         <div>
@@ -429,7 +419,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
     </div>
   </div>
 
-  <!-- OVERLAY: FOYER -->
+  <!-- FOYER -->
   <div class="overlay" id="foyer-overlay" onclick="if(event.target===this)closeFoyerSheet()">
     <div class="sheet">
       <div class="sheet-handle"></div>
@@ -437,7 +427,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
       <div class="foyer-section">
         <div class="foyer-section-title">Ton code de foyer</div>
         <div class="code-box"><span class="code-value" id="foyer-code">——</span><button class="btn-copy" onclick="copyFoyerCode()">📋 COPIER</button></div>
-        <p class="code-hint">Invite directement quelqu'un par email — il n'aura qu'à créer un mot de passe.</p>
+        <p class="code-hint">Invite directement par email — la personne n'aura qu'à créer son mot de passe.</p>
         <div class="join-row" style="margin-top:10px">
           <input class="field-input" id="invite-email-input" type="email" placeholder="email@exemple.com">
           <button class="btn-join" onclick="generateInviteLink()">INVITER</button>
@@ -450,18 +440,19 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
       </div>
       <div class="foyer-section">
         <div class="foyer-section-title">Rejoindre un autre foyer</div>
-        <div class="join-row">
-          <input class="field-input" id="join-code-input" type="text" placeholder="ABC123" maxlength="6">
-          <button class="btn-join" onclick="doJoin()">REJOINDRE</button>
-        </div>
+        <div class="join-row"><input class="field-input" id="join-code-input" type="text" placeholder="ABC123" maxlength="6"><button class="btn-join" onclick="doJoin()">REJOINDRE</button></div>
         <div class="share-msg" id="share-msg"></div>
+      </div>
+      <div class="foyer-section">
+        <div class="foyer-section-title">Déconnexion automatique</div>
+        <div class="logout-opts" id="logout-opts"></div>
       </div>
       <button class="btn-leave" onclick="doLeave()">Quitter ce foyer (créer mon propre foyer)</button>
       <button class="btn-cancel" onclick="closeFoyerSheet()">FERMER</button>
     </div>
   </div>
 
-  <!-- OVERLAY: INVITATION -->
+  <!-- INVITATION -->
   <div class="overlay" id="invite-overlay">
     <div class="sheet">
       <div class="sheet-handle"></div>
@@ -476,221 +467,208 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
     </div>
   </div>
 
-  <!-- OVERLAY: GESTION RAYONS -->
+  <!-- GESTION RAYONS -->
   <div class="overlay" id="cat-manage-overlay" onclick="if(event.target===this)closeCatManage()">
     <div class="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-title teal">⚙️ Ordre des rayons</div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Maintiens et fais glisser ≡ pour réordonner</p>
       <div class="cat-manage-list" id="cat-manage-list"></div>
       <div class="add-cat-row">
-        <input class="field-input" id="new-cat-input" placeholder="Nom du nouveau rayon…" maxlength="30" style="font-size:14px">
+        <input class="field-input" id="new-cat-input" placeholder="Nouveau rayon…" maxlength="30" style="font-size:14px">
         <button class="btn-add-cat" onclick="addCategory()">+</button>
       </div>
       <button class="btn-cancel" onclick="closeCatManage()">FERMER</button>
     </div>
   </div>
 
+  <!-- EXIT TOAST -->
+  <div class="exit-toast" id="exit-toast">Appuie encore pour quitter</div>
+
 </div><!-- /screen-app -->
 
 <script>
 firebase.initializeApp(FIREBASE_CONFIG);
-const auth = firebase.auth();
-const db   = firebase.firestore();
+const auth=firebase.auth(), db=firebase.firestore();
 
-// ── URL PARAMS (invitation) ──
-const _up       = new URLSearchParams(window.location.search);
-let pendingJoinCode = _up.get('join')  ? _up.get('join').toUpperCase()              : null;
-let pendingEmail    = _up.get('email') ? decodeURIComponent(_up.get('email'))       : null;
+// URL params
+const _up=new URLSearchParams(window.location.search);
+let pendingJoinCode=_up.get('join')?_up.get('join').toUpperCase():null;
+let pendingEmail=_up.get('email')?decodeURIComponent(_up.get('email')):null;
 
-// ── DEFAULT CATEGORIES ──
-const DEFAULT_CATEGORIES = [
-  {id:'fruits',  name:'🍎 Fruits & Légumes'},
-  {id:'boulange',name:'🥖 Boulangerie'},
-  {id:'cremerie',name:'🧀 Crémerie'},
-  {id:'charcut', name:'🥩 Charcuterie'},
-  {id:'epicerie',name:'🧂 Épicerie'},
-  {id:'surgeles',name:'🧊 Surgelés'},
-  {id:'hygiene', name:'🧴 Hygiène'},
-  {id:'boissons',name:'🥤 Boissons'},
-  {id:'autres',  name:'📦 Autres'},
+// Default categories
+const DEFAULT_CATEGORIES=[
+  {id:'fruits',name:'🍎 Fruits & Légumes'},{id:'boulange',name:'🥖 Boulangerie'},
+  {id:'cremerie',name:'🧀 Crémerie'},{id:'charcut',name:'🥩 Charcuterie'},
+  {id:'epicerie',name:'🧂 Épicerie'},{id:'surgeles',name:'🧊 Surgelés'},
+  {id:'hygiene',name:'🧴 Hygiène'},{id:'boissons',name:'🥤 Boissons'},
+  {id:'autres',name:'📦 Autres'},
 ];
 
-// ── STATE ──
-let currentUser        = null;
-let currentHouseholdId = null;
-let householdUnsub     = null;
-let debits             = [];
-let checked            = [];
-let courses            = [];
-let courseCategories   = [];
-let manageMode         = false;
-let activeTab          = 'depenses';
-let selectedCatId      = null;
-let bannerDismissedToday = null;
-let authMode           = 'login';
+// Emoji groups for picker
+const EMOJI_GROUPS=[
+  ['🍎','🍊','🍋','🍇','🍓','🫐','🍅','🥕','🥦','🧅','🧄','🥑'],
+  ['🥩','🐟','🍗','🥚','🥓','🦐','🍖'],
+  ['🧀','🥛','🧈','🍦','🥗'],
+  ['🍞','🥐','🥖','🧁','🍰','🥨'],
+  ['🥤','🧃','☕','🍷','🍺','🧋'],
+  ['🧴','🧼','🪥','🧹','🧻','🧽','🪣'],
+  ['🛒','🍝','🥫','🧂','🛢️','💊','🔋','🪴'],
+];
+
+// State
+let currentUser=null, currentHouseholdId=null, householdUnsub=null;
+let debits=[], checked=[], courses=[], courseCategories=[];
+let manageMode=false, activeTab='depenses', selectedCatId=null;
+let selectedEmoji='', bannerDismissedToday=null, authMode='login';
+let autoLogoutMinutes=15, autoLogoutTimer=null;
 
 // ── SCREENS ──
-function showScreen(s) {
-  ['loading','auth','app'].forEach(n =>
-    document.getElementById('screen-'+n).style.display = n===s ? '' : 'none'
-  );
+function showScreen(s){
+  ['loading','auth','app'].forEach(n=>document.getElementById('screen-'+n).style.display=n===s?'':'none');
 }
 
-// ══════════════════════════════════
-//  AUTH STATE
-// ══════════════════════════════════
-auth.onAuthStateChanged(async user => {
-  if (user) {
-    currentUser = user;
-    try {
-      await initHousehold();
-      startHouseholdListener();
-    } catch(e) {
-      console.error('Init foyer:', e);
-      debits=[]; checked=[]; courses=[]; courseCategories=[];
-    }
+// ══════════ AUTH STATE ══════════
+auth.onAuthStateChanged(async user=>{
+  if(user){
+    currentUser=user;
+    try{await initHousehold();startHouseholdListener();}
+    catch(e){console.error('Init:',e);debits=[];checked=[];courses=[];courseCategories=[];}
+    await loadUserPrefs();
     requestNotifPermission();
     showScreen('app');
-    updateHeaderForTab();
-    render(); renderCourses();
-    if (pendingJoinCode && pendingJoinCode !== currentHouseholdId) {
-      document.getElementById('invite-code-display').textContent = pendingJoinCode;
+    updateHeaderForTab();render();renderCourses();
+    if(pendingJoinCode&&pendingJoinCode!==currentHouseholdId){
+      document.getElementById('invite-code-display').textContent=pendingJoinCode;
       document.getElementById('invite-overlay').classList.add('open');
+      pushNavState();
     }
+    resetAutoLogoutTimer();
   } else {
     stopHouseholdListener();
-    currentUser=null; currentHouseholdId=null; debits=[]; checked=[]; courses=[]; courseCategories=[];
+    currentUser=null;currentHouseholdId=null;debits=[];checked=[];courses=[];courseCategories=[];
+    clearTimeout(autoLogoutTimer);
     showScreen('auth');
-    if (pendingEmail) {
-      switchTab('register');
+    if(pendingEmail){
+      switchAuthTab('register');
       const inp=document.getElementById('auth-email');
-      inp.value=pendingEmail; inp.readOnly=true; inp.style.opacity='.65';
-      document.getElementById('auth-sub').innerHTML='🔒 Crée ton mot de passe pour<br>rejoindre le foyer partagé';
+      inp.value=pendingEmail;inp.readOnly=true;inp.style.opacity='.65';
+      document.getElementById('auth-sub').innerHTML='🔒 Crée ton mot de passe pour<br>rejoindre le foyer';
     }
   }
 });
 
-// ══════════════════════════════════
-//  FIRESTORE
-// ══════════════════════════════════
-async function generateUniqueCode() {
-  let code, exists=true;
-  while(exists) {
-    code=Math.random().toString(36).substr(2,6).toUpperCase();
-    const d=await db.collection('households').doc(code).get();
-    exists=d.exists;
-  }
+// ══════════ FIRESTORE ══════════
+async function generateUniqueCode(){
+  let code,exists=true;
+  while(exists){code=Math.random().toString(36).substr(2,6).toUpperCase();const d=await db.collection('households').doc(code).get();exists=d.exists;}
   return code;
 }
-
-async function initHousehold() {
-  const userDoc=await db.collection('users').doc(currentUser.uid).get();
-  if (userDoc.exists && userDoc.data().householdId) {
-    currentHouseholdId=userDoc.data().householdId;
-  } else {
-    const code=await generateUniqueCode();
-    currentHouseholdId=code;
-    await db.collection('households').doc(code).set({
-      members:[currentUser.uid], memberEmails:[currentUser.email],
-      owner:currentUser.uid, debits:[], checked:[],
-      courses:[], courseCategories:[...DEFAULT_CATEGORIES],
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
-    await db.collection('users').doc(currentUser.uid).set({householdId:code, email:currentUser.email});
+async function initHousehold(){
+  const ud=await db.collection('users').doc(currentUser.uid).get();
+  if(ud.exists&&ud.data().householdId){currentHouseholdId=ud.data().householdId;}
+  else{
+    const code=await generateUniqueCode();currentHouseholdId=code;
+    await db.collection('households').doc(code).set({members:[currentUser.uid],memberEmails:[currentUser.email],owner:currentUser.uid,debits:[],checked:[],courses:[],courseCategories:[...DEFAULT_CATEGORIES],createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    await db.collection('users').doc(currentUser.uid).set({householdId:code,email:currentUser.email,autoLogoutMinutes:15});
   }
 }
-
-function startHouseholdListener() {
+function startHouseholdListener(){
   stopHouseholdListener();
-  householdUnsub = db.collection('households').doc(currentHouseholdId)
-    .onSnapshot(snap => {
-      if (!snap.exists) return;
-      const d=snap.data();
-      debits           = d.debits           || [];
-      checked          = d.checked          || [];
-      courses          = d.courses          || [];
-      courseCategories = d.courseCategories && d.courseCategories.length ? d.courseCategories : [...DEFAULT_CATEGORIES];
-      render();
-      renderCourses();
-      checkTodayDebits();
-    }, e => console.error('Listener:',e));
+  householdUnsub=db.collection('households').doc(currentHouseholdId).onSnapshot(snap=>{
+    if(!snap.exists)return;
+    const d=snap.data();
+    debits=d.debits||[];checked=d.checked||[];courses=d.courses||[];
+    courseCategories=d.courseCategories&&d.courseCategories.length?d.courseCategories:[...DEFAULT_CATEGORIES];
+    render();renderCourses();checkTodayDebits();
+  },e=>console.error('Listener:',e));
+}
+function stopHouseholdListener(){if(householdUnsub){householdUnsub();householdUnsub=null;}}
+async function saveDebits(){if(!currentHouseholdId)return;try{await db.collection('households').doc(currentHouseholdId).set({debits,checked,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}catch(e){console.error(e);}}
+async function saveCourses(){if(!currentHouseholdId)return;try{await db.collection('households').doc(currentHouseholdId).set({courses,courseCategories,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}catch(e){console.error(e);}}
+
+// ══════════ AUTO-LOGOUT ══════════
+const LOGOUT_OPTIONS=[{v:5,l:'5 min'},{v:15,l:'15 min'},{v:30,l:'30 min'},{v:60,l:'1 heure'},{v:0,l:'Jamais'}];
+async function loadUserPrefs(){
+  try{
+    const ud=await db.collection('users').doc(currentUser.uid).get();
+    autoLogoutMinutes=ud.exists&&ud.data().autoLogoutMinutes!==undefined?ud.data().autoLogoutMinutes:15;
+  }catch(e){}
+}
+function resetAutoLogoutTimer(){
+  clearTimeout(autoLogoutTimer);
+  if(!currentUser||autoLogoutMinutes<=0)return;
+  autoLogoutTimer=setTimeout(async()=>{await auth.signOut();},autoLogoutMinutes*60*1000);
+}
+['click','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,()=>{if(currentUser)resetAutoLogoutTimer();},{passive:true}));
+async function setAutoLogout(minutes){
+  autoLogoutMinutes=minutes;resetAutoLogoutTimer();
+  renderLogoutOpts();
+  try{await db.collection('users').doc(currentUser.uid).update({autoLogoutMinutes:minutes});}catch(e){}
+}
+function renderLogoutOpts(){
+  document.getElementById('logout-opts').innerHTML=LOGOUT_OPTIONS.map(o=>`
+    <button class="logout-opt${o.v===autoLogoutMinutes?' active':''}" onclick="setAutoLogout(${o.v})">${o.l}</button>`).join('');
 }
 
-function stopHouseholdListener() {
-  if (householdUnsub){householdUnsub();householdUnsub=null;}
-}
+// ══════════ BACK BUTTON ══════════
+const OVERLAY_IDS=['overlay','course-overlay','foyer-overlay','invite-overlay','cat-manage-overlay'];
+let canExit=false, exitToastTimer=null;
+function pushNavState(){history.pushState({nav:true},'');}
+window.addEventListener('popstate',e=>{
+  // Close topmost open overlay
+  const open=OVERLAY_IDS.slice().reverse().find(id=>document.getElementById(id)?.classList.contains('open'));
+  if(open){document.getElementById(open).classList.remove('open');pushNavState();return;}
+  // Go back to depenses tab from courses
+  if(activeTab==='courses'){setTab('depenses');pushNavState();return;}
+  // Show exit toast
+  if(canExit){canExit=false;clearTimeout(exitToastTimer);return;} // allow exit (do nothing = browser handles)
+  pushNavState(); // prevent exit
+  canExit=true;
+  const toast=document.getElementById('exit-toast');
+  toast.classList.add('show');
+  exitToastTimer=setTimeout(()=>{canExit=false;toast.classList.remove('show');},2500);
+});
+// Init history state on app load
+history.pushState({nav:true},'');
 
-async function saveDebits() {
-  if (!currentHouseholdId) return;
-  try {
-    await db.collection('households').doc(currentHouseholdId).set(
-      {debits,checked,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}
-    );
-  } catch(e){console.error('saveDebits:',e);}
-}
-
-async function saveCourses() {
-  if (!currentHouseholdId) return;
-  try {
-    await db.collection('households').doc(currentHouseholdId).set(
-      {courses,courseCategories,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}
-    );
-  } catch(e){console.error('saveCourses:',e);}
-}
-
-// ══════════════════════════════════
-//  TAB NAVIGATION
-// ══════════════════════════════════
-function setTab(tab) {
+// ══════════ TABS ══════════
+function setTab(tab){
   activeTab=tab;
-  document.getElementById('view-depenses').style.display = tab==='depenses' ? '' : 'none';
-  document.getElementById('view-courses').style.display  = tab==='courses'  ? '' : 'none';
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+  document.getElementById('view-depenses').style.display=tab==='depenses'?'':'none';
+  document.getElementById('view-courses').style.display=tab==='courses'?'':'none';
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   updateHeaderForTab();
-  if (tab==='courses') renderCourses();
+  if(tab==='courses')renderCourses();
 }
-
-function updateHeaderForTab() {
-  const isD = activeTab==='depenses';
-  document.getElementById('summary-block').style.display = isD ? '' : 'none';
-  document.getElementById('manageBtn').style.display     = isD ? '' : 'none';
-  document.getElementById('resetBtn').style.display      = isD ? '' : 'none';
+function updateHeaderForTab(){
+  const isD=activeTab==='depenses';
+  document.getElementById('summary-block').style.display=isD?'':'none';
+  document.getElementById('manageBtn').style.display=isD?'':'none';
+  document.getElementById('resetBtn').style.display=isD?'':'none';
   const fab=document.getElementById('fab');
-  fab.className = (isD&&manageMode) ? 'fab hidden' : 'fab';
-  fab.className += (isD ? '' : ' teal');
+  fab.className=(isD&&manageMode)?'fab hidden':('fab'+(isD?'':' teal'));
 }
+function fabAction(){if(activeTab==='depenses')openSheet();else openCourseSheet();}
 
-function fabAction() {
-  if (activeTab==='depenses') openSheet();
-  else openCourseSheet();
-}
-
-// ══════════════════════════════════
-//  NOTIFICATIONS
-// ══════════════════════════════════
-function checkTodayDebits() {
-  const today=new Date().getDate(), todayStr=new Date().toLocaleDateString('fr-FR');
+// ══════════ NOTIFICATIONS ══════════
+function checkTodayDebits(){
+  const today=new Date().getDate(),ts=new Date().toLocaleDateString('fr-FR');
   const list=debits.filter(d=>d.day===today&&!checked.includes(d.id));
   const banner=document.getElementById('today-banner');
-  if (!list.length || bannerDismissedToday===todayStr){banner.classList.remove('show');return;}
-  document.getElementById('banner-items').innerHTML=list.map(d=>`
-    <div class="today-banner-row"><span class="today-banner-name">${d.label}</span><span class="today-banner-amt">${fmt(d.amount)}</span></div>`).join('');
+  if(!list.length||bannerDismissedToday===ts){banner.classList.remove('show');return;}
+  document.getElementById('banner-items').innerHTML=list.map(d=>`<div class="today-banner-row"><span class="today-banner-name">${d.label}</span><span class="today-banner-amt">${fmt(d.amount)}</span></div>`).join('');
   const t=document.getElementById('banner-total');
-  if (list.length>1){document.getElementById('banner-total-amt').textContent=fmt(list.reduce((s,d)=>s+d.amount,0));t.style.display='flex';}
-  else t.style.display='none';
+  if(list.length>1){document.getElementById('banner-total-amt').textContent=fmt(list.reduce((s,d)=>s+d.amount,0));t.style.display='flex';}else t.style.display='none';
   banner.classList.add('show');
-  if ('Notification' in window && Notification.permission==='granted') {
-    new Notification('🔔 Prélèvements du jour',{body:list.map(d=>`${d.label} : ${fmt(d.amount)}`).join('\n'),tag:'prev-'+todayStr});
-  }
+  if('Notification'in window&&Notification.permission==='granted')new Notification('🔔 Prélèvements du jour',{body:list.map(d=>`${d.label} : ${fmt(d.amount)}`).join('\n'),tag:'prev-'+ts});
 }
 function dismissBanner(){bannerDismissedToday=new Date().toLocaleDateString('fr-FR');document.getElementById('today-banner').classList.remove('show');}
-async function requestNotifPermission(){if('Notification' in window && Notification.permission==='default') setTimeout(()=>Notification.requestPermission(),3000);}
+async function requestNotifPermission(){if('Notification'in window&&Notification.permission==='default')setTimeout(()=>Notification.requestPermission(),3000);}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentUser)checkTodayDebits();});
 
-// ══════════════════════════════════
-//  AUTH UI
-// ══════════════════════════════════
-function switchTab(tab) {
+// ══════════ AUTH UI ══════════
+function switchAuthTab(tab){
   authMode=tab;
   document.getElementById('tab-login').classList.toggle('active',tab==='login');
   document.getElementById('tab-register').classList.toggle('active',tab==='register');
@@ -698,29 +676,25 @@ function switchTab(tab) {
   document.getElementById('btn-submit').textContent=tab==='login'?'SE CONNECTER':'CRÉER MON COMPTE';
   document.getElementById('auth-forgot').style.display=tab==='login'?'':'none';
   document.getElementById('pwd-strength').classList.remove('show');
-  if (tab==='login'&&!pendingEmail){const i=document.getElementById('auth-email');i.readOnly=false;i.style.opacity='';}
+  if(tab==='login'&&!pendingEmail){const i=document.getElementById('auth-email');i.readOnly=false;i.style.opacity='';}
   clearMsg();
 }
-function onPwdInput(v) {
-  if (authMode!=='register') return;
+function onPwdInput(v){
+  if(authMode!=='register')return;
   const ps=document.getElementById('pwd-strength');
-  if (!v){ps.classList.remove('show');return;}
-  ps.classList.add('show');
-  let s=0;
-  if(v.length>=8)s++;if(v.length>=12)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;
-  const l=s<=1?1:s<=2?2:s<=3?3:4;
-  ps.className=`pwd-strength show str-${l}`;
+  if(!v){ps.classList.remove('show');return;}ps.classList.add('show');
+  let s=0;if(v.length>=8)s++;if(v.length>=12)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;
+  const l=s<=1?1:s<=2?2:s<=3?3:4;ps.className=`pwd-strength show str-${l}`;
   ps.querySelector('.pwd-label').textContent=['','Faible','Moyen','Bon','Fort ✓'][l];
 }
 function showMsg(t,type='error'){const e=document.getElementById('auth-msg');e.textContent=t;e.className='auth-msg '+type;e.style.display='block';}
 function clearMsg(){document.getElementById('auth-msg').style.display='none';}
-const ERR={'auth/wrong-password':'Email ou mot de passe incorrect','auth/invalid-credential':'Email ou mot de passe incorrect','auth/user-not-found':'Aucun compte avec cet email','auth/email-already-in-use':'Email déjà utilisé','auth/weak-password':'Mot de passe trop court (6 car. min.)','auth/invalid-email':'Email invalide','auth/too-many-requests':'Trop de tentatives','auth/network-request-failed':'Erreur réseau'};
+const ERR={'auth/wrong-password':'Email ou mot de passe incorrect','auth/invalid-credential':'Email ou mot de passe incorrect','auth/user-not-found':'Aucun compte avec cet email','auth/email-already-in-use':'Email déjà utilisé','auth/weak-password':'Mot de passe trop court (6 min.)','auth/invalid-email':'Email invalide','auth/too-many-requests':'Trop de tentatives','auth/network-request-failed':'Erreur réseau'};
 async function submitAuth(){
   const email=document.getElementById('auth-email').value.trim();
   const pass=document.getElementById('auth-password').value;
   const pass2=document.getElementById('auth-password2').value;
-  const btn=document.getElementById('btn-submit');
-  clearMsg();
+  const btn=document.getElementById('btn-submit');clearMsg();
   if(!email||!pass){showMsg('Remplis tous les champs');return;}
   if(authMode==='register'){
     if(pass!==pass2){showMsg('Les mots de passe ne correspondent pas');return;}
@@ -738,17 +712,17 @@ async function forgotPassword(){
   try{await auth.sendPasswordResetEmail(email);showMsg('Email de réinitialisation envoyé ✓','success');}
   catch(e){showMsg(ERR[e.code]||e.message);}
 }
-async function logout(){manageMode=false;stopHouseholdListener();await auth.signOut();}
+async function logout(){manageMode=false;stopHouseholdListener();clearTimeout(autoLogoutTimer);await auth.signOut();}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-auth').style.display!=='none')submitAuth();});
 
-// ══════════════════════════════════
-//  FOYER / SHARING
-// ══════════════════════════════════
+// ══════════ FOYER ══════════
 async function openFoyerSheet(){
   document.getElementById('foyer-code').textContent=currentHouseholdId||'—';
   document.getElementById('share-msg').style.display='none';
   document.getElementById('join-code-input').value='';
+  renderLogoutOpts();
   document.getElementById('foyer-overlay').classList.add('open');
+  pushNavState();
   await refreshMembers();
 }
 function closeFoyerSheet(){document.getElementById('foyer-overlay').classList.remove('open');}
@@ -756,107 +730,69 @@ async function refreshMembers(){
   const snap=await db.collection('households').doc(currentHouseholdId).get();
   const emails=snap.exists?(snap.data().memberEmails||[]):[];
   document.getElementById('members-list').innerHTML=emails.map(e=>`
-    <div class="member-item">
-      <div class="member-avatar ${e===currentUser.email?'me':''}">${e[0].toUpperCase()}</div>
-      <span class="member-email">${e}</span>
-      ${e===currentUser.email?'<span class="member-you">toi</span>':''}
-    </div>`).join('');
+    <div class="member-item"><div class="member-avatar ${e===currentUser.email?'me':''}">${e[0].toUpperCase()}</div><span class="member-email">${e}</span>${e===currentUser.email?'<span class="member-you">toi</span>':''}</div>`).join('');
 }
 function copyFoyerCode(){
-  navigator.clipboard.writeText(currentHouseholdId).then(()=>{
-    const btn=document.querySelector('.btn-copy');btn.textContent='✓ COPIÉ';
-    setTimeout(()=>btn.textContent='📋 COPIER',2000);
-  }).catch(()=>{
-    const el=document.getElementById('foyer-code');
-    const r=document.createRange();r.selectNode(el);window.getSelection().removeAllRanges();window.getSelection().addRange(r);
-  });
+  navigator.clipboard.writeText(currentHouseholdId).then(()=>{const b=document.querySelector('.btn-copy');b.textContent='✓ COPIÉ';setTimeout(()=>b.textContent='📋 COPIER',2000);}).catch(()=>{});
 }
 function generateInviteLink(){
   const email=document.getElementById('invite-email-input').value.trim();
   if(!email){document.getElementById('invite-email-input').focus();return;}
   const url=window.location.origin+window.location.pathname+'?join='+currentHouseholdId+'&email='+encodeURIComponent(email);
-  if(navigator.share){navigator.share({title:'Invitation Mon Foyer 🏠',text:currentUser.email.split('@')[0]+' t\'invite à rejoindre son foyer.',url});}
-  else{navigator.clipboard.writeText(url).then(()=>{const b=document.querySelector('.btn-join');b.textContent='✓ COPIÉ';setTimeout(()=>b.textContent='INVITER',2000);});}
+  if(navigator.share)navigator.share({title:'Invitation Mon Foyer 🏠',text:currentUser.email.split('@')[0]+' t\'invite à rejoindre son foyer.',url});
+  else navigator.clipboard.writeText(url).then(()=>{const b=document.querySelector('#foyer-overlay .btn-join');b.textContent='✓ COPIÉ';setTimeout(()=>b.textContent='INVITER',2000);});
 }
 async function doJoin(){
   const code=document.getElementById('join-code-input').value.trim().toUpperCase();
-  const msg=document.getElementById('share-msg'); msg.style.display='none';
+  const msg=document.getElementById('share-msg');msg.style.display='none';
   if(code.length<6){msg.textContent='Code invalide (6 caractères)';msg.className='share-msg error';msg.style.display='block';return;}
   if(code===currentHouseholdId){msg.textContent='Tu fais déjà partie de ce foyer';msg.className='share-msg error';msg.style.display='block';return;}
   try{
     const hs=await db.collection('households').doc(code).get();
     if(!hs.exists){msg.textContent='Code invalide — aucun foyer trouvé';msg.className='share-msg error';msg.style.display='block';return;}
-    await db.collection('households').doc(code).update({
-      members:firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
-      memberEmails:firebase.firestore.FieldValue.arrayUnion(currentUser.email)
-    });
-    const oldSnap=await db.collection('households').doc(currentHouseholdId).get();
-    if(oldSnap.exists){
-      const om=oldSnap.data().members||[];
-      if(om.length<=1)await db.collection('households').doc(currentHouseholdId).delete();
-      else await db.collection('households').doc(currentHouseholdId).update({members:firebase.firestore.FieldValue.arrayRemove(currentUser.uid),memberEmails:firebase.firestore.FieldValue.arrayRemove(currentUser.email)});
-    }
-    stopHouseholdListener();
-    currentHouseholdId=code;
+    await db.collection('households').doc(code).update({members:firebase.firestore.FieldValue.arrayUnion(currentUser.uid),memberEmails:firebase.firestore.FieldValue.arrayUnion(currentUser.email)});
+    const os=await db.collection('households').doc(currentHouseholdId).get();
+    if(os.exists){const om=os.data().members||[];if(om.length<=1)await db.collection('households').doc(currentHouseholdId).delete();else await db.collection('households').doc(currentHouseholdId).update({members:firebase.firestore.FieldValue.arrayRemove(currentUser.uid),memberEmails:firebase.firestore.FieldValue.arrayRemove(currentUser.email)});}
+    stopHouseholdListener();currentHouseholdId=code;
     await db.collection('users').doc(currentUser.uid).update({householdId:code});
     startHouseholdListener();
-    document.getElementById('foyer-code').textContent=code;
-    await refreshMembers();
-    msg.textContent='✓ Foyer rejoint ! Données synchronisées.';msg.className='share-msg success';msg.style.display='block';
+    document.getElementById('foyer-code').textContent=code;await refreshMembers();
+    msg.textContent='✓ Foyer rejoint !';msg.className='share-msg success';msg.style.display='block';
     document.getElementById('join-code-input').value='';
   }catch(e){msg.textContent='Erreur : '+e.message;msg.className='share-msg error';msg.style.display='block';}
 }
 async function doLeave(){
   if(!confirm('Quitter ce foyer ? Tu repartiras avec un foyer vide.'))return;
   const os=await db.collection('households').doc(currentHouseholdId).get();
-  if(os.exists){
-    const om=os.data().members||[];
-    if(om.length<=1)await db.collection('households').doc(currentHouseholdId).delete();
-    else await db.collection('households').doc(currentHouseholdId).update({members:firebase.firestore.FieldValue.arrayRemove(currentUser.uid),memberEmails:firebase.firestore.FieldValue.arrayRemove(currentUser.email)});
-  }
+  if(os.exists){const om=os.data().members||[];if(om.length<=1)await db.collection('households').doc(currentHouseholdId).delete();else await db.collection('households').doc(currentHouseholdId).update({members:firebase.firestore.FieldValue.arrayRemove(currentUser.uid),memberEmails:firebase.firestore.FieldValue.arrayRemove(currentUser.email)});}
   stopHouseholdListener();
-  const nc=await generateUniqueCode();
-  currentHouseholdId=nc;
+  const nc=await generateUniqueCode();currentHouseholdId=nc;
   await db.collection('households').doc(nc).set({members:[currentUser.uid],memberEmails:[currentUser.email],owner:currentUser.uid,debits:[],checked:[],courses:[],courseCategories:[...DEFAULT_CATEGORIES],createdAt:firebase.firestore.FieldValue.serverTimestamp()});
   await db.collection('users').doc(currentUser.uid).update({householdId:nc});
-  startHouseholdListener();
-  closeFoyerSheet();
+  startHouseholdListener();closeFoyerSheet();
 }
-function generateInviteLink2(){}// alias
 function acceptInvite(){document.getElementById('invite-overlay').classList.remove('open');document.getElementById('join-code-input').value=pendingJoinCode;window.history.replaceState({},'',window.location.pathname);doJoin();pendingJoinCode=null;}
 function declineInvite(){document.getElementById('invite-overlay').classList.remove('open');pendingJoinCode=null;window.history.replaceState({},'',window.location.pathname);}
 
-// ══════════════════════════════════
-//  DÉPENSES LOGIC
-// ══════════════════════════════════
+// ══════════ DÉPENSES ══════════
 function fmt(v){return v.toFixed(2).replace('.',',')+'\u202f€';}
 function nextDebitId(){return debits.length?Math.max(...debits.map(d=>d.id))+1:1;}
 function getNextDay(){const t=new Date().getDate();const u=debits.filter(d=>!checked.includes(d.id)&&d.day>=t).sort((a,b)=>a.day-b.day);return u.length?u[0].day:null;}
-
 function render(){
   const total=debits.reduce((s,d)=>s+d.amount,0);
   const paid=debits.filter(d=>checked.includes(d.id)).reduce((s,d)=>s+d.amount,0);
   const pct=total>0?Math.round((paid/total)*100):0;
-  const today=new Date().getDate(), nextDay=getNextDay();
+  const today=new Date().getDate(),nextDay=getNextDay();
   const month=new Date().toLocaleDateString('fr-FR',{month:'long',year:'numeric'}).toUpperCase();
-  if(currentUser) document.getElementById('userLabel').textContent=currentUser.email.split('@')[0]+' · '+month;
-  document.getElementById('totalVal').textContent=fmt(total);
-  document.getElementById('paidVal').textContent=fmt(paid);
+  if(currentUser)document.getElementById('userLabel').textContent=currentUser.email.split('@')[0]+' · '+month;
+  document.getElementById('totalVal').textContent=fmt(total);document.getElementById('paidVal').textContent=fmt(paid);
   document.getElementById('remainVal').textContent=fmt(total-paid);
-  document.getElementById('progressFill').style.width=pct+'%';
-  document.getElementById('progressPct').textContent=pct+'%';
-  const btn=document.getElementById('manageBtn');
-  btn.textContent=manageMode?'✅ TERMINER':'✏️ GÉRER';
-  btn.classList.toggle('active',manageMode);
+  document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressPct').textContent=pct+'%';
+  const btn=document.getElementById('manageBtn');btn.textContent=manageMode?'✅ TERMINER':'✏️ GÉRER';btn.classList.toggle('active',manageMode);
   updateHeaderForTab();
-
-  const list=document.getElementById('list'); list.innerHTML='';
-  if(!debits.length){
-    list.innerHTML=`<div class="empty-state"><span class="empty-icon">💳</span><div class="empty-title">Aucun prélèvement</div><p class="empty-sub">Appuie sur <strong>+</strong> pour ajouter<br>ton premier prélèvement fixe.</p><button class="btn-empty-add" onclick="openSheet()">+ Ajouter</button></div>`;return;
-  }
-  if(!manageMode&&debits.length>0&&checked.length===debits.length){
-    list.innerHTML=`<div class="all-done"><span class="all-done-icon">🎉</span><strong>Tous les prélèvements sont passés !</strong><br>Bonne fin de mois 💸<br><button class="btn-reset-inline" onclick="resetAll()">↺ Tout remettre à zéro</button></div>`;return;
-  }
+  const list=document.getElementById('list');list.innerHTML='';
+  if(!debits.length){list.innerHTML=`<div class="empty-state"><span class="empty-icon">💳</span><div class="empty-title">Aucun prélèvement</div><p class="empty-sub">Appuie sur <strong>+</strong> pour ajouter<br>ton premier prélèvement fixe.</p><button class="btn-empty-add" onclick="openSheet()">+ Ajouter</button></div>`;return;}
+  if(!manageMode&&debits.length>0&&checked.length===debits.length){list.innerHTML=`<div class="all-done"><span class="all-done-icon">🎉</span><strong>Tous les prélèvements sont passés !</strong><br>Bonne fin de mois 💸<br><button class="btn-reset-inline" onclick="resetAll()">↺ Tout remettre à zéro</button></div>`;return;}
   [...debits].sort((a,b)=>a.day-b.day).forEach(d=>{
     const isChecked=!manageMode&&checked.includes(d.id);
     const isToday=!manageMode&&!isChecked&&d.day===today;
@@ -881,17 +817,13 @@ function saveInline(id,item){
   const av=parseFloat(item.querySelector('[data-field="amount"]').value);
   if(!lv||isNaN(dv)||dv<1||dv>31||isNaN(av)||av<=0){item.style.borderColor='var(--danger)';setTimeout(()=>item.style.borderColor='',1200);return;}
   const idx=debits.findIndex(d=>d.id===id);if(idx===-1)return;
-  debits[idx]={...debits[idx],label:lv,day:dv,amount:Math.round(av*100)/100};
-  saveDebits();
+  debits[idx]={...debits[idx],label:lv,day:dv,amount:Math.round(av*100)/100};saveDebits();
 }
-function toggle(id){
-  if(checked.includes(id))checked=checked.filter(x=>x!==id);else checked.push(id);
-  render();checkTodayDebits();saveDebits();
-}
+function toggle(id){if(checked.includes(id))checked=checked.filter(x=>x!==id);else checked.push(id);render();checkTodayDebits();saveDebits();}
 function deleteDebit(id){debits=debits.filter(d=>d.id!==id);checked=checked.filter(x=>x!==id);saveDebits();}
 function toggleManage(){manageMode=!manageMode;render();}
 function resetAll(){checked=[];render();checkTodayDebits();saveDebits();}
-function openSheet(){document.getElementById('overlay').classList.add('open');setTimeout(()=>document.getElementById('inp-label').focus(),300);}
+function openSheet(){document.getElementById('overlay').classList.add('open');pushNavState();setTimeout(()=>document.getElementById('inp-label').focus(),300);}
 function closeSheet(){document.getElementById('overlay').classList.remove('open');['inp-label','inp-day','inp-amount'].forEach(i=>document.getElementById(i).value='');['err-label','err-day','err-amount'].forEach(i=>document.getElementById(i).classList.remove('show'));}
 function confirmSheet(){
   const label=document.getElementById('inp-label').value.trim();
@@ -900,91 +832,82 @@ function confirmSheet(){
   let ok=true;
   const err=(id,show)=>{document.getElementById(id).classList.toggle('show',show);if(show)ok=false;};
   err('err-label',!label);err('err-day',isNaN(day)||day<1||day>31);err('err-amount',isNaN(amount)||amount<=0);
-  if(!ok)return;
-  debits.push({id:nextDebitId(),day,label,amount:Math.round(amount*100)/100});
-  saveDebits();closeSheet();
+  if(!ok)return;debits.push({id:nextDebitId(),day,label,amount:Math.round(amount*100)/100});saveDebits();closeSheet();
 }
 
-// ══════════════════════════════════
-//  COURSES LOGIC
-// ══════════════════════════════════
+// ══════════ COURSES ══════════
 function nextCourseId(){return courses.length?Math.max(...courses.map(c=>c.id))+1:1;}
 function getCats(){return courseCategories.length?courseCategories:[...DEFAULT_CATEGORIES];}
 
 function renderCourses(){
-  const list=document.getElementById('course-list'); list.innerHTML='';
-  const total=courses.length, done=courses.filter(c=>c.done).length;
-  document.getElementById('courses-count').textContent=
-    total===0?'Liste vide':`${done}/${total} article${total>1?'s':''} cochés`;
-
+  const list=document.getElementById('course-list');list.innerHTML='';
+  const total=courses.length,done=courses.filter(c=>c.done).length;
+  document.getElementById('courses-count').textContent=total===0?'Liste vide':`${done}/${total} article${total>1?'s':''} cochés`;
   if(!total){
-    list.innerHTML=`<div class="courses-empty"><span class="courses-empty-icon">🛒</span><div class="empty-title" style="margin-bottom:8px">Liste vide</div><p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:24px">Appuie sur <strong>+</strong> pour ajouter<br>tes articles de courses.</p><button class="btn-empty-add" onclick="openCourseSheet()">+ Ajouter un article</button></div>`;
-    return;
+    list.innerHTML=`<div class="courses-empty"><span class="courses-empty-icon">🛒</span><div class="empty-title" style="margin-bottom:8px">Liste vide</div><p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:24px">Appuie sur <strong>+</strong> pour ajouter<br>tes articles de courses.</p><button class="btn-empty-add" onclick="openCourseSheet()">+ Ajouter un article</button></div>`;return;
   }
-  const cats=getCats();
-  const usedCatIds=new Set(courses.map(c=>c.catId));
-
+  const cats=getCats();const usedCatIds=new Set(courses.map(c=>c.catId));
   cats.forEach(cat=>{
-    const items=courses.filter(c=>c.catId===cat.id);
-    if(!items.length)return;
+    const items=courses.filter(c=>c.catId===cat.id);if(!items.length)return;
+    usedCatIds.delete(cat.id);
     const section=document.createElement('div');section.className='cat-section';
-    const doneC=items.filter(c=>c.done).length;
-    const allDone=doneC===items.length;
+    const doneC=items.filter(c=>c.done).length,allDone=doneC===items.length;
     section.innerHTML=`<div class="cat-header${allDone?' cat-all-done':''}"><span class="cat-label">${cat.name}</span><span class="cat-count${allDone?' cat-count-done':''}">${doneC}/${items.length}</span></div>`;
     items.forEach(c=>{
       const el=document.createElement('div');el.className='course-item'+(c.done?' done':'');
       el.innerHTML=`<div class="course-check" onclick="toggleCourse(${c.id})"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5l3 3 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="course-name">${c.name}</span><button class="course-del" onclick="deleteCourseItem(${c.id})">×</button>`;
       section.appendChild(el);
-    });
-    list.appendChild(section);
-    usedCatIds.delete(cat.id);
+    });list.appendChild(section);
   });
-
-  // Articles orphelins (catégorie supprimée)
   if(usedCatIds.size){
     const orphans=courses.filter(c=>usedCatIds.has(c.catId));
     if(orphans.length){
       const section=document.createElement('div');section.className='cat-section';
       section.innerHTML=`<div class="cat-header"><span class="cat-label">📦 Autres</span><span class="cat-count">${orphans.length}</span></div>`;
-      orphans.forEach(c=>{
-        const el=document.createElement('div');el.className='course-item'+(c.done?' done':'');
-        el.innerHTML=`<div class="course-check" onclick="toggleCourse(${c.id})"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5l3 3 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="course-name">${c.name}</span><button class="course-del" onclick="deleteCourseItem(${c.id})">×</button>`;
-        section.appendChild(el);
-      });
+      orphans.forEach(c=>{const el=document.createElement('div');el.className='course-item'+(c.done?' done':'');el.innerHTML=`<div class="course-check" onclick="toggleCourse(${c.id})"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5l3 3 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="course-name">${c.name}</span><button class="course-del" onclick="deleteCourseItem(${c.id})">×</button>`;section.appendChild(el);});
       list.appendChild(section);
     }
   }
 }
-
-function toggleCourse(id){
-  const idx=courses.findIndex(c=>c.id===id);if(idx===-1)return;
-  courses[idx].done=!courses[idx].done;
-  renderCourses();saveCourses();
-}
+function toggleCourse(id){const idx=courses.findIndex(c=>c.id===id);if(idx===-1)return;courses[idx].done=!courses[idx].done;renderCourses();saveCourses();}
 function deleteCourseItem(id){courses=courses.filter(c=>c.id!==id);renderCourses();saveCourses();}
-function clearDoneCourses(){
-  if(!courses.some(c=>c.done))return;
-  courses=courses.filter(c=>!c.done);renderCourses();saveCourses();
+function clearDoneCourses(){if(!courses.some(c=>c.done))return;courses=courses.filter(c=>!c.done);renderCourses();saveCourses();}
+
+// EMOJI PICKER
+function buildEmojiRow(){
+  const row=document.getElementById('emoji-row');
+  const allEmojis=EMOJI_GROUPS.flat();
+  row.innerHTML='<button class="emoji-btn sel" data-emoji="" onclick="selectEmoji(event,\'\')">✕</button>'+
+    allEmojis.map(e=>`<button class="emoji-btn" data-emoji="${e}" onclick="selectEmoji(event,'${e}')">${e}</button>`).join('');
+  selectedEmoji='';
+}
+function selectEmoji(e,emoji){
+  e.preventDefault();
+  selectedEmoji=emoji;
+  document.querySelectorAll('.emoji-btn').forEach(b=>b.classList.toggle('sel',b.dataset.emoji===emoji));
+  // Update name field prefix
+  const inp=document.getElementById('course-name');
+  let name=inp.value.replace(/^\S+\s*/,''); // strip existing emoji prefix
+  if(emoji)inp.value=emoji+' '+name; else inp.value=name;
 }
 
 function openCourseSheet(){
   const cats=getCats();
-  selectedCatId=cats[0]?.id||null;
-  document.getElementById('cat-chips').innerHTML=cats.map(cat=>`
-    <div class="cat-chip${cat.id===selectedCatId?' sel':''}" data-catid="${cat.id}" onclick="selectCourseCategory('${cat.id}')">${cat.name}</div>`).join('');
+  selectedCatId=cats[0]?.id||null;selectedEmoji='';
+  buildEmojiRow();
+  document.getElementById('cat-chips').innerHTML=cats.map(cat=>`<div class="cat-chip${cat.id===selectedCatId?' sel':''}" data-catid="${cat.id}" onclick="selectCourseCategory('${cat.id}')">${cat.name}</div>`).join('');
   document.getElementById('course-name').value='';
   document.getElementById('err-course-name').classList.remove('show');
   document.getElementById('err-course-cat').classList.remove('show');
-  document.getElementById('course-overlay').classList.add('open');
+  document.getElementById('course-overlay').classList.add('open');pushNavState();
   setTimeout(()=>document.getElementById('course-name').focus(),300);
 }
-function closeCourseSheet(){document.getElementById('course-overlay').classList.remove('open');selectedCatId=null;}
-function selectCourseCategory(catId){
-  selectedCatId=catId;
-  document.querySelectorAll('.cat-chip').forEach(el=>el.classList.toggle('sel',el.dataset.catid===catId));
-}
+function closeCourseSheet(){document.getElementById('course-overlay').classList.remove('open');selectedCatId=null;selectedEmoji='';}
+function selectCourseCategory(catId){selectedCatId=catId;document.querySelectorAll('.cat-chip').forEach(el=>el.classList.toggle('sel',el.dataset.catid===catId));}
 function confirmAddCourse(){
-  const name=document.getElementById('course-name').value.trim();
+  // Build name with emoji prefix if selected
+  const rawName=document.getElementById('course-name').value.trim();
+  const name=rawName||'';
   let ok=true;
   document.getElementById('err-course-name').classList.toggle('show',!name);if(!name)ok=false;
   document.getElementById('err-course-cat').classList.toggle('show',!selectedCatId);if(!selectedCatId)ok=false;
@@ -994,34 +917,71 @@ function confirmAddCourse(){
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('course-overlay').classList.contains('open'))confirmAddCourse();});
 
-// ── CATEGORY MANAGEMENT ──
-function openCatManage(){renderCatManage();document.getElementById('cat-manage-overlay').classList.add('open');}
+// ══════════ DRAG & DROP CATEGORIES ══════════
+let dragSrc=null,dragSrcIdx=-1,dragCurIdx=-1,dragItems=[];
+
+function openCatManage(){renderCatManage();document.getElementById('cat-manage-overlay').classList.add('open');pushNavState();}
 function closeCatManage(){document.getElementById('cat-manage-overlay').classList.remove('open');renderCourses();}
+
 function renderCatManage(){
   const cats=getCats();
-  document.getElementById('cat-manage-list').innerHTML=cats.map((cat,i)=>`
-    <div class="cat-manage-item">
+  const list=document.getElementById('cat-manage-list');
+  list.innerHTML=cats.map((cat,i)=>`
+    <div class="cat-manage-item" data-idx="${i}">
+      <span class="drag-handle" data-handle="1">⋮⋮</span>
       <span class="cat-manage-name">${cat.name}</span>
-      <button class="cat-move-btn" onclick="moveCat(${i},-1)" ${i===0?'disabled':''}title="Monter">↑</button>
-      <button class="cat-move-btn" onclick="moveCat(${i},1)"  ${i===cats.length-1?'disabled':''}title="Descendre">↓</button>
-      <button class="cat-del-btn"  onclick="deleteCat('${cat.id}')" title="Supprimer">×</button>
+      <button class="cat-del-btn" onclick="deleteCat('${cat.id}')">×</button>
     </div>`).join('');
+
+  dragItems=Array.from(list.querySelectorAll('.cat-manage-item'));
+
+  // Touch drag
+  list.addEventListener('touchstart',onTouchDragStart,{passive:false});
+  list.addEventListener('touchmove', onTouchDragMove, {passive:false});
+  list.addEventListener('touchend',  onTouchDragEnd);
 }
-function moveCat(idx,dir){
-  const cats=[...getCats()];
-  const ni=idx+dir;if(ni<0||ni>=cats.length)return;
-  [cats[idx],cats[ni]]=[cats[ni],cats[idx]];
-  courseCategories=cats;renderCatManage();saveCourses();
+
+function onTouchDragStart(e){
+  if(!e.target.dataset.handle)return;
+  const item=e.target.closest('.cat-manage-item');
+  dragItems=Array.from(document.querySelectorAll('.cat-manage-item'));
+  dragSrcIdx=dragItems.indexOf(item);
+  if(dragSrcIdx===-1)return;
+  dragSrc=item;dragCurIdx=dragSrcIdx;
+  item.classList.add('dragging');
+  e.preventDefault();
 }
+function onTouchDragMove(e){
+  if(!dragSrc)return;e.preventDefault();
+  const y=e.touches[0].clientY;
+  dragItems.forEach(it=>it.classList.remove('drop-above','drop-below'));
+  for(let i=0;i<dragItems.length;i++){
+    if(dragItems[i]===dragSrc)continue;
+    const rect=dragItems[i].getBoundingClientRect();
+    const mid=rect.top+rect.height/2;
+    if(y<mid&&i<dragSrcIdx){dragItems[i].classList.add('drop-above');dragCurIdx=i;break;}
+    if(y>mid&&i>dragSrcIdx){dragItems[i].classList.add('drop-below');dragCurIdx=i;}
+  }
+}
+function onTouchDragEnd(){
+  if(!dragSrc)return;
+  dragSrc.classList.remove('dragging');
+  dragItems.forEach(it=>it.classList.remove('drop-above','drop-below'));
+  if(dragCurIdx!==-1&&dragCurIdx!==dragSrcIdx){
+    const cats=[...getCats()];
+    const [moved]=cats.splice(dragSrcIdx,1);cats.splice(dragCurIdx,0,moved);
+    courseCategories=cats;renderCatManage();saveCourses();
+  }
+  dragSrc=null;dragSrcIdx=-1;dragCurIdx=-1;
+}
+
 function deleteCat(catId){
   if(courses.some(c=>c.catId===catId)){alert('Ce rayon contient des articles. Supprime-les d\'abord.');return;}
   courseCategories=getCats().filter(c=>c.id!==catId);renderCatManage();saveCourses();
 }
 function addCategory(){
-  const input=document.getElementById('new-cat-input');
-  const name=input.value.trim();if(!name)return;
-  const id='cat_'+name.toLowerCase().replace(/[^a-z0-9]/g,'')+'_'+Date.now();
-  courseCategories=[...getCats(),{id,name}];
+  const input=document.getElementById('new-cat-input');const name=input.value.trim();if(!name)return;
+  const id='cat_'+Date.now();courseCategories=[...getCats(),{id,name}];
   input.value='';renderCatManage();saveCourses();
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('cat-manage-overlay').classList.contains('open'))addCategory();});
