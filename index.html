@@ -202,9 +202,9 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 /* CAT MANAGE — DRAG & DROP */
 .cat-manage-list{display:flex;flex-direction:column;gap:7px;max-height:320px;overflow-y:auto;margin-bottom:14px}
 .cat-manage-item{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;transition:all .2s;touch-action:none}
-.cat-manage-item.dragging{opacity:.6;background:var(--accent-dim);border-color:var(--accent);box-shadow:var(--shadow-md);transform:scale(1.02)}
-.cat-manage-item.drop-above{border-top:2px solid var(--accent)}
-.cat-manage-item.drop-below{border-bottom:2px solid var(--accent)}
+.cat-manage-item.dragging{opacity:.85;background:var(--accent-dim);border:2px solid var(--accent);box-shadow:0 8px 28px rgba(59,91,255,.3);transform:scale(1.04);position:relative;z-index:10}
+.cat-manage-item.drop-above{border-top:3px solid var(--accent)!important;background:rgba(59,91,255,.04)}
+.cat-manage-item.drop-below{border-bottom:3px solid var(--accent)!important;background:rgba(59,91,255,.04)}
 .drag-handle{color:var(--border2);font-size:20px;cursor:grab;padding:2px 4px;flex-shrink:0;user-select:none;letter-spacing:-2px}
 .cat-manage-name{flex:1;font-size:13px;font-weight:500}
 .cat-del-btn{background:var(--danger-dim);border:1px solid rgba(232,52,74,.2);color:var(--danger);width:30px;height:30px;border-radius:7px;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
@@ -218,6 +218,13 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .logout-opt{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.06em;padding:7px 12px;cursor:pointer;transition:all .18s;color:var(--text-muted)}
 .logout-opt.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
 .logout-opt:active{transform:scale(.97)}
+
+/* CAT EMOJI PICKER */
+.cat-emoji-row{display:flex;overflow-x:auto;gap:5px;padding:6px 0 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-bottom:1px solid var(--border);margin-bottom:12px}
+.cat-emoji-row::-webkit-scrollbar{display:none}
+.cat-emoji-btn{font-size:22px;background:none;border:2px solid transparent;cursor:pointer;padding:4px 5px;border-radius:9px;flex-shrink:0;transition:all .15s;line-height:1}
+.cat-emoji-btn.sel{background:var(--accent-dim);border-color:var(--accent)}
+.cat-emoji-btn:active{background:var(--surface2)}
 
 /* OVERLAYS & SHEETS */
 .overlay{position:fixed;inset:0;background:rgba(26,29,46,.45);backdrop-filter:blur(4px);z-index:300;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -474,8 +481,9 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
       <div class="sheet-title teal">⚙️ Ordre des rayons</div>
       <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Maintiens et fais glisser ≡ pour réordonner</p>
       <div class="cat-manage-list" id="cat-manage-list"></div>
+      <div class="cat-emoji-row" id="cat-emoji-row"></div>
       <div class="add-cat-row">
-        <input class="field-input" id="new-cat-input" placeholder="Nouveau rayon…" maxlength="30" style="font-size:14px">
+        <input class="field-input" id="new-cat-input" placeholder="Nom du rayon…" maxlength="30" style="font-size:14px">
         <button class="btn-add-cat" onclick="addCategory()">+</button>
       </div>
       <button class="btn-cancel" onclick="closeCatManage()">FERMER</button>
@@ -615,22 +623,29 @@ function renderLogoutOpts(){
 const OVERLAY_IDS=['overlay','course-overlay','foyer-overlay','invite-overlay','cat-manage-overlay'];
 let canExit=false, exitToastTimer=null;
 function pushNavState(){history.pushState({nav:true},'');}
-window.addEventListener('popstate',e=>{
-  // Close topmost open overlay
+window.addEventListener('popstate',()=>{
+  // 1. Fermer l'overlay du dessus
   const open=OVERLAY_IDS.slice().reverse().find(id=>document.getElementById(id)?.classList.contains('open'));
   if(open){document.getElementById(open).classList.remove('open');pushNavState();return;}
-  // Go back to depenses tab from courses
+  // 2. Revenir à dépenses depuis courses
   if(activeTab==='courses'){setTab('depenses');pushNavState();return;}
-  // Show exit toast
-  if(canExit){canExit=false;clearTimeout(exitToastTimer);return;} // allow exit (do nothing = browser handles)
-  pushNavState(); // prevent exit
+  // 3. Gestion quitter l'app
+  if(canExit){
+    // 2e appui : on laisse le navigateur faire (app se ferme)
+    clearTimeout(exitToastTimer);
+    document.getElementById('exit-toast').classList.remove('show');
+    return; // ne pas pushState → le navigateur ferme
+  }
+  // 1er appui : afficher le toast et rester sur la page
+  pushNavState();
   canExit=true;
   const toast=document.getElementById('exit-toast');
   toast.classList.add('show');
   exitToastTimer=setTimeout(()=>{canExit=false;toast.classList.remove('show');},2500);
 });
-// Init history state on app load
-history.pushState({nav:true},'');
+// Init history — on met 2 états pour avoir de la marge
+history.replaceState({nav:'base'},'');
+history.pushState({nav:'app'},'');
 
 // ══════════ TABS ══════════
 function setTab(tab){
@@ -925,6 +940,7 @@ function closeCatManage(){document.getElementById('cat-manage-overlay').classLis
 
 function renderCatManage(){
   const cats=getCats();
+  selectedCatEmoji='';buildCatEmojiPicker();
   const list=document.getElementById('cat-manage-list');
   list.innerHTML=cats.map((cat,i)=>`
     <div class="cat-manage-item" data-idx="${i}">
@@ -936,13 +952,12 @@ function renderCatManage(){
   dragItems=Array.from(list.querySelectorAll('.cat-manage-item'));
 
   // Touch drag
+  // Seul touchstart sur la liste — move/end ajoutés dynamiquement
   list.addEventListener('touchstart',onTouchDragStart,{passive:false});
-  list.addEventListener('touchmove', onTouchDragMove, {passive:false});
-  list.addEventListener('touchend',  onTouchDragEnd);
 }
 
 function onTouchDragStart(e){
-  if(!e.target.dataset.handle)return;
+  if(!e.target.closest('[data-handle]'))return;
   const item=e.target.closest('.cat-manage-item');
   dragItems=Array.from(document.querySelectorAll('.cat-manage-item'));
   dragSrcIdx=dragItems.indexOf(item);
@@ -950,6 +965,9 @@ function onTouchDragStart(e){
   dragSrc=item;dragCurIdx=dragSrcIdx;
   item.classList.add('dragging');
   e.preventDefault();
+  // Ajouter les listeners SEULEMENT quand le drag commence
+  document.addEventListener('touchmove',onTouchDragMove,{passive:false});
+  document.addEventListener('touchend',onTouchDragEnd);
 }
 function onTouchDragMove(e){
   if(!dragSrc)return;e.preventDefault();
@@ -965,6 +983,9 @@ function onTouchDragMove(e){
 }
 function onTouchDragEnd(){
   if(!dragSrc)return;
+  // Retirer les listeners dynamiques
+  document.removeEventListener('touchmove',onTouchDragMove);
+  document.removeEventListener('touchend',onTouchDragEnd);
   dragSrc.classList.remove('dragging');
   dragItems.forEach(it=>it.classList.remove('drop-above','drop-below'));
   if(dragCurIdx!==-1&&dragCurIdx!==dragSrcIdx){
@@ -979,10 +1000,25 @@ function deleteCat(catId){
   if(courses.some(c=>c.catId===catId)){alert('Ce rayon contient des articles. Supprime-les d\'abord.');return;}
   courseCategories=getCats().filter(c=>c.id!==catId);renderCatManage();saveCourses();
 }
+const CAT_EMOJIS=['🍎','🥩','🧀','🥖','🧂','🧊','🧴','🥤','📦','🍷','🐟','🥚','🍰','🧹','🔋','🐾','🛒','🫙','🌿','🧸'];
+let selectedCatEmoji='';
+
+function buildCatEmojiPicker(){
+  const row=document.getElementById('cat-emoji-row');
+  if(!row)return;
+  row.innerHTML=CAT_EMOJIS.map(e=>
+    `<button class="cat-emoji-btn${e===selectedCatEmoji?' sel':''}" onclick="pickCatEmoji('${e}')">${e}</button>`
+  ).join('');
+}
+function pickCatEmoji(emoji){
+  selectedCatEmoji=selectedCatEmoji===emoji?'':emoji;
+  buildCatEmojiPicker();
+}
 function addCategory(){
   const input=document.getElementById('new-cat-input');const name=input.value.trim();if(!name)return;
-  const id='cat_'+Date.now();courseCategories=[...getCats(),{id,name}];
-  input.value='';renderCatManage();saveCourses();
+  const fullName=selectedCatEmoji?selectedCatEmoji+' '+name:name;
+  const id='cat_'+Date.now();courseCategories=[...getCats(),{id,name:fullName}];
+  input.value='';selectedCatEmoji='';renderCatManage();saveCourses();
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('cat-manage-overlay').classList.contains('open'))addCategory();});
 </script>
