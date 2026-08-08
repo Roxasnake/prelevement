@@ -668,7 +668,7 @@ window.addEventListener('popstate',()=>{
   if(open){document.getElementById(open).classList.remove('open');pushNavState();return;}
   // 2. Revenir à dépenses depuis courses
   if(activeTab==='courses'){setTab('depenses');pushNavState();return;}
-  // 3. Gestion quitter l'app
+  // 3. Gestion quitter l’app
   if(canExit){
     // 2e appui : on laisse le navigateur faire (app se ferme)
     clearTimeout(exitToastTimer);
@@ -1060,10 +1060,10 @@ async function renderWatchChecklist(){
     try{btOk=await navigator.bluetooth.getAvailability();}catch(e){}
   }
   const items=[
-    {ok:notifOk, label:'Notifications autorisées dans Chrome',    hint:notifOk?'':'Va dans Paramètres Chrome → Autorisations → Notifications'},
-    {ok:btOk,    label:'Bluetooth activé sur le téléphone',        hint:btOk===false?'Active le Bluetooth dans les paramètres Android':''},
-    {ok:null,    label:'Garmin Connect ouvert en arrière-plan',    hint:'Vérifie que l'app tourne en fond'},
-    {ok:null,    label:'Forerunner 935 connecté en Bluetooth',     hint:'L'icône Bluetooth doit être active sur la montre'},
+    {ok:notifOk, label:'Notifications autorisées dans Chrome',         hint:notifOk?'':'Va dans Paramètres Chrome → Autorisations → Notifications'},
+    {ok:btOk,    label:'Bluetooth activé sur le téléphone',            hint:btOk===false?'Active le Bluetooth dans les paramètres Android':''},
+    {ok:null,    label:'Garmin Connect ouvert en arrière-plan',        hint:'Vérifie que l\u2019app tourne en fond'},
+    {ok:null,    label:'Forerunner 935 connecté en Bluetooth',         hint:'L\u2019icône Bluetooth doit être active sur la montre'},
     {ok:null,    label:'Notifs Chrome autorisées dans Garmin Connect', hint:'Garmin Connect → Paramètres → Notifications → Chrome ✓'},
   ];
   el.innerHTML=items.map(i=>`
@@ -1074,7 +1074,7 @@ async function renderWatchChecklist(){
 }
 async function sendTestNotification(){
   if(!('Notification' in window)||Notification.permission!=='granted'){
-    alert('Notifications non autorisées. Active-les d'abord dans Chrome.');return;
+    alert('Notifications non autorisées. Active-les d’abord dans Chrome.');return;
   }
   new Notification('📡 Test Mon Foyer',{body:'Si tu vois ceci sur ta montre Garmin, tout fonctionne ✓',tag:'watch-test',silent:false});
 }
