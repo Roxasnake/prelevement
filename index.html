@@ -226,6 +226,19 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .cat-emoji-btn.sel{background:var(--accent-dim);border-color:var(--accent)}
 .cat-emoji-btn:active{background:var(--surface2)}
 
+/* TOGGLE SWITCH */
+.watch-section{display:flex;flex-direction:column;gap:12px}
+.watch-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.watch-toggle-info{flex:1;min-width:0}
+.watch-toggle-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.watch-toggle-sub{font-size:11px;color:var(--text-muted);line-height:1.4}
+.toggle-switch{width:46px;height:27px;border-radius:99px;background:var(--border2);cursor:pointer;position:relative;transition:background .25s;flex-shrink:0}
+.toggle-switch.on{background:var(--green)}
+.toggle-knob{width:21px;height:21px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:transform .25s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle-switch.on .toggle-knob{transform:translateX(19px)}
+.icon-btn.watch-btn{background:rgba(14,165,233,.1);border-color:rgba(14,165,233,.3);color:var(--teal);font-weight:700}
+.icon-btn.watch-btn:active{background:var(--teal);color:#fff}
+
 /* OVERLAYS & SHEETS */
 .overlay{position:fixed;inset:0;background:rgba(26,29,46,.45);backdrop-filter:blur(4px);z-index:300;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
 .overlay.open{opacity:1;pointer-events:all}
@@ -365,6 +378,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
     <div class="courses-toolbar">
       <span class="courses-count" id="courses-count"></span>
       <div style="display:flex;gap:7px">
+        <button class="icon-btn watch-btn" id="watch-btn" onclick="sendCoursesToWatch()" style="display:none">📡 MONTRE</button>
         <button class="icon-btn" onclick="openCatManage()">⚙️ RAYONS</button>
         <button class="icon-btn" onclick="clearDoneCourses()">🗑 VIDER ✓</button>
       </div>
@@ -454,6 +468,18 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
         <div class="foyer-section-title">Déconnexion automatique</div>
         <div class="logout-opts" id="logout-opts"></div>
       </div>
+      <div class="foyer-section">
+        <div class="foyer-section-title">⌚ Mode montre Garmin</div>
+        <div class="watch-section">
+          <div class="watch-toggle-row">
+            <div class="watch-toggle-info">
+              <div class="watch-toggle-title">Envoyer les courses en notifications</div>
+              <div class="watch-toggle-sub">Navigue entre les articles depuis la montre avec le bouton ↓</div>
+            </div>
+            <div class="toggle-switch" id="watch-toggle" onclick="toggleWatchMode()"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+      </div>
       <button class="btn-leave" onclick="doLeave()">Quitter ce foyer (créer mon propre foyer)</button>
       <button class="btn-cancel" onclick="closeFoyerSheet()">FERMER</button>
     </div>
@@ -530,6 +556,7 @@ let debits=[], checked=[], courses=[], courseCategories=[];
 let manageMode=false, activeTab='depenses', selectedCatId=null;
 let selectedEmoji='', bannerDismissedToday=null, authMode='login';
 let autoLogoutMinutes=15, autoLogoutTimer=null;
+let watchModeEnabled=false;
 
 // ── SCREENS ──
 function showScreen(s){
@@ -663,6 +690,7 @@ function updateHeaderForTab(){
   document.getElementById('resetBtn').style.display=isD?'':'none';
   const fab=document.getElementById('fab');
   fab.className=(isD&&manageMode)?'fab hidden':('fab'+(isD?'':' teal'));
+  updateWatchBtn();
 }
 function fabAction(){if(activeTab==='depenses')openSheet();else openCourseSheet();}
 
@@ -736,6 +764,7 @@ async function openFoyerSheet(){
   document.getElementById('share-msg').style.display='none';
   document.getElementById('join-code-input').value='';
   renderLogoutOpts();
+  renderWatchToggle();
   document.getElementById('foyer-overlay').classList.add('open');
   pushNavState();
   await refreshMembers();
@@ -1000,6 +1029,58 @@ function deleteCat(catId){
   if(courses.some(c=>c.catId===catId)){alert('Ce rayon contient des articles. Supprime-les d\'abord.');return;}
   courseCategories=getCats().filter(c=>c.id!==catId);renderCatManage();saveCourses();
 }
+// ══════════ MODE MONTRE GARMIN ══════════
+function renderWatchToggle(){
+  const el=document.getElementById('watch-toggle');
+  if(el)el.classList.toggle('on',watchModeEnabled);
+}
+function updateWatchBtn(){
+  const btn=document.getElementById('watch-btn');
+  if(btn)btn.style.display=(watchModeEnabled&&activeTab==='courses')?'':'none';
+}
+async function toggleWatchMode(){
+  if(!watchModeEnabled){
+    // Activation → demander la permission notifications
+    if('Notification' in window&&Notification.permission==='default'){
+      const p=await Notification.requestPermission();
+      if(p!=='granted'){alert('Active les notifications dans les paramètres du navigateur pour utiliser ce mode.');return;}
+    }
+    if(!('Notification' in window)||Notification.permission!=='granted'){
+      alert('Les notifications sont bloquées. Active-les dans Chrome → Paramètres du site.');return;
+    }
+  }
+  watchModeEnabled=!watchModeEnabled;
+  renderWatchToggle();updateWatchBtn();
+  try{await db.collection('users').doc(currentUser.uid).update({watchMode:watchModeEnabled});}catch(e){}
+}
+async function sendCoursesToWatch(){
+  if(!('Notification' in window)||Notification.permission!=='granted'){
+    alert('Notifications non autorisées. Active le mode montre dans ⚙️ Foyer.');return;
+  }
+  const cats=getCats();
+  const unchecked=courses.filter(c=>!c.done);
+  if(!unchecked.length){
+    new Notification('🛒 Courses terminées !',{body:'Tous les articles sont cochés 🎉',tag:'courses-done',silent:false});return;
+  }
+  // Envoyer d'abord une notification de résumé
+  new Notification(`🛒 Liste de courses — ${unchecked.length} article${unchecked.length>1?'s':''}`,{
+    body:'Utilise ↓ sur la montre pour naviguer',
+    tag:'courses-start',silent:false
+  });
+  // Puis chaque article avec délai pour que la montre les reçoive dans l'ordre
+  unchecked.forEach((course,i)=>{
+    const cat=cats.find(c=>c.id===course.catId);
+    const catName=cat?cat.name.replace(/^\S+\s*/,''):'';
+    setTimeout(()=>{
+      new Notification(`${i+1}/${unchecked.length}  ${course.name}`,{
+        body:catName?'📍 '+catName:'',
+        tag:'course-item-'+i,
+        silent:true  // silencieux sauf le premier
+      });
+    },(i+1)*400);
+  });
+}
+
 const CAT_EMOJIS=['🍎','🥩','🧀','🥖','🧂','🧊','🧴','🥤','📦','🍷','🐟','🥚','🍰','🧹','🔋','🐾','🛒','🫙','🌿','🧸'];
 let selectedCatEmoji='';
 
