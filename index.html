@@ -238,6 +238,13 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .toggle-switch.on .toggle-knob{transform:translateX(19px)}
 .icon-btn.watch-btn{background:rgba(14,165,233,.1);border-color:rgba(14,165,233,.3);color:var(--teal);font-weight:700}
 .icon-btn.watch-btn:active{background:var(--teal);color:#fff}
+.watch-checklist{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.watch-check-item{display:flex;align-items:flex-start;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.watch-check-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.watch-check-label{font-size:13px;font-weight:500;color:var(--text);line-height:1.3}
+.watch-check-hint{font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.4}
+.btn-watch-test{width:100%;background:var(--teal-dim);border:1.5px solid rgba(14,165,233,.3);color:var(--teal);border-radius:11px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;padding:12px;cursor:pointer;margin-top:10px;transition:all .18s}
+.btn-watch-test:active{background:var(--teal);color:#fff}
 
 /* OVERLAYS & SHEETS */
 .overlay{position:fixed;inset:0;background:rgba(26,29,46,.45);backdrop-filter:blur(4px);z-index:300;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -474,9 +481,13 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
           <div class="watch-toggle-row">
             <div class="watch-toggle-info">
               <div class="watch-toggle-title">Envoyer les courses en notifications</div>
-              <div class="watch-toggle-sub">Navigue entre les articles depuis la montre avec le bouton ↓</div>
+              <div class="watch-toggle-sub">Navigue entre les articles avec ↓ sur la montre</div>
             </div>
             <div class="toggle-switch" id="watch-toggle" onclick="toggleWatchMode()"><div class="toggle-knob"></div></div>
+          </div>
+          <div id="watch-status" style="display:none">
+            <div class="watch-checklist" id="watch-checklist"></div>
+            <button class="btn-watch-test" onclick="sendTestNotification()">📡 Envoyer une notification test</button>
           </div>
         </div>
       </div>
@@ -570,6 +581,7 @@ auth.onAuthStateChanged(async user=>{
     try{await initHousehold();startHouseholdListener();}
     catch(e){console.error('Init:',e);debits=[];checked=[];courses=[];courseCategories=[];}
     await loadUserPrefs();
+    renderWatchToggle(); updateWatchBtn(); // persistance toggle
     requestNotifPermission();
     showScreen('app');
     updateHeaderForTab();render();renderCourses();
@@ -764,7 +776,7 @@ async function openFoyerSheet(){
   document.getElementById('share-msg').style.display='none';
   document.getElementById('join-code-input').value='';
   renderLogoutOpts();
-  renderWatchToggle();
+  renderWatchToggle(); // renderWatchChecklist est appelé dedans si actif
   document.getElementById('foyer-overlay').classList.add('open');
   pushNavState();
   await refreshMembers();
@@ -1033,6 +1045,38 @@ function deleteCat(catId){
 function renderWatchToggle(){
   const el=document.getElementById('watch-toggle');
   if(el)el.classList.toggle('on',watchModeEnabled);
+  const statusEl=document.getElementById('watch-status');
+  if(statusEl)statusEl.style.display=watchModeEnabled?'':'none';
+  if(watchModeEnabled)renderWatchChecklist();
+}
+async function renderWatchChecklist(){
+  const el=document.getElementById('watch-checklist');
+  if(!el)return;
+  // Notifications
+  const notifOk='Notification' in window&&Notification.permission==='granted';
+  // Bluetooth
+  let btOk=null;
+  if(navigator.bluetooth&&navigator.bluetooth.getAvailability){
+    try{btOk=await navigator.bluetooth.getAvailability();}catch(e){}
+  }
+  const items=[
+    {ok:notifOk, label:'Notifications autorisées dans Chrome',    hint:notifOk?'':'Va dans Paramètres Chrome → Autorisations → Notifications'},
+    {ok:btOk,    label:'Bluetooth activé sur le téléphone',        hint:btOk===false?'Active le Bluetooth dans les paramètres Android':''},
+    {ok:null,    label:'Garmin Connect ouvert en arrière-plan',    hint:'Vérifie que l'app tourne en fond'},
+    {ok:null,    label:'Forerunner 935 connecté en Bluetooth',     hint:'L'icône Bluetooth doit être active sur la montre'},
+    {ok:null,    label:'Notifs Chrome autorisées dans Garmin Connect', hint:'Garmin Connect → Paramètres → Notifications → Chrome ✓'},
+  ];
+  el.innerHTML=items.map(i=>`
+    <div class="watch-check-item">
+      <span class="watch-check-icon">${i.ok===true?'✅':i.ok===false?'❌':'⚠️'}</span>
+      <div><div class="watch-check-label">${i.label}</div>${i.hint?`<div class="watch-check-hint">${i.hint}</div>`:''}</div>
+    </div>`).join('');
+}
+async function sendTestNotification(){
+  if(!('Notification' in window)||Notification.permission!=='granted'){
+    alert('Notifications non autorisées. Active-les d'abord dans Chrome.');return;
+  }
+  new Notification('📡 Test Mon Foyer',{body:'Si tu vois ceci sur ta montre Garmin, tout fonctionne ✓',tag:'watch-test',silent:false});
 }
 function updateWatchBtn(){
   const btn=document.getElementById('watch-btn');
@@ -1051,7 +1095,7 @@ async function toggleWatchMode(){
   }
   watchModeEnabled=!watchModeEnabled;
   renderWatchToggle();updateWatchBtn();
-  try{await db.collection('users').doc(currentUser.uid).update({watchMode:watchModeEnabled});}catch(e){}
+  try{await db.collection('users').doc(currentUser.uid).update({watchMode:watchModeEnabled});}catch(e){console.error('Save watchMode:',e);}
 }
 async function sendCoursesToWatch(){
   if(!('Notification' in window)||Notification.permission!=='granted'){
