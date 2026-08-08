@@ -568,6 +568,14 @@ let manageMode=false, activeTab='depenses', selectedCatId=null;
 let selectedEmoji='', bannerDismissedToday=null, authMode='login';
 let autoLogoutMinutes=15, autoLogoutTimer=null;
 let watchModeEnabled=false;
+let swRegistration=null;
+
+// Enregistrement Service Worker (nécessaire pour les vraies notifications Android)
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js')
+    .then(reg=>{ swRegistration=reg; console.log('SW OK'); })
+    .catch(e=>console.warn('SW échec:',e));
+}
 
 // ── SCREENS ──
 function showScreen(s){
@@ -1074,9 +1082,12 @@ async function renderWatchChecklist(){
 }
 async function sendTestNotification(){
   if(!('Notification' in window)||Notification.permission!=='granted'){
-    alert('Notifications non autorisées. Active-les d’abord dans Chrome.');return;
+    alert('Notifications non autorisées. Active-les dans Chrome d’abord.');return;
   }
-  new Notification('📡 Test Mon Foyer',{body:'Si tu vois ceci sur ta montre Garmin, tout fonctionne ✓',tag:'watch-test',silent:false});
+  await notify('📡 Test Mon Foyer',{
+    body:'Si tu vois ceci sur ta Forerunner 935, tout fonctionne ✓',
+    tag:'watch-test'
+  });
 }
 function updateWatchBtn(){
   const btn=document.getElementById('watch-btn');
@@ -1097,31 +1108,43 @@ async function toggleWatchMode(){
   renderWatchToggle();updateWatchBtn();
   try{await db.collection('users').doc(currentUser.uid).update({watchMode:watchModeEnabled});}catch(e){console.error('Save watchMode:',e);}
 }
+async function notify(title, opts){
+  // Utilise le Service Worker pour de vraies notifs Android (visibles sur Garmin)
+  if(swRegistration){
+    try{ await swRegistration.showNotification(title, opts); return; }catch(e){ console.warn('SW notif fail:',e); }
+  }
+  // Fallback navigateur (ne passe pas sur Garmin)
+  if('Notification' in window && Notification.permission==='granted') new Notification(title, opts);
+}
+
 async function sendCoursesToWatch(){
   if(!('Notification' in window)||Notification.permission!=='granted'){
-    alert('Notifications non autorisées. Active le mode montre dans ⚙️ Foyer.');return;
+    alert('Notifications non autorisées. Active le mode montre dans FOYER.');return;
+  }
+  if(!swRegistration){
+    alert('Service Worker non chargé. Recharge la page et réessaie.');return;
   }
   const cats=getCats();
   const unchecked=courses.filter(c=>!c.done);
   if(!unchecked.length){
-    new Notification('🛒 Courses terminées !',{body:'Tous les articles sont cochés 🎉',tag:'courses-done',silent:false});return;
+    await notify('🛒 Courses terminées !',{body:'Tous les articles sont cochés 🎉',tag:'courses-done'});return;
   }
-  // Envoyer d'abord une notification de résumé
-  new Notification(`🛒 Liste de courses — ${unchecked.length} article${unchecked.length>1?'s':''}`,{
-    body:'Utilise ↓ sur la montre pour naviguer',
-    tag:'courses-start',silent:false
+  // Notification de résumé
+  await notify(`🛒 ${unchecked.length} article${unchecked.length>1?'s':''}`,{
+    body:'Utilise ↓ sur la montre pour naviguer entre les articles',
+    tag:'courses-start'
   });
-  // Puis chaque article avec délai pour que la montre les reçoive dans l'ordre
+  // Chaque article avec délai (ordre garanti pour la montre)
   unchecked.forEach((course,i)=>{
     const cat=cats.find(c=>c.id===course.catId);
     const catName=cat?cat.name.replace(/^\S+\s*/,''):'';
-    setTimeout(()=>{
-      new Notification(`${i+1}/${unchecked.length}  ${course.name}`,{
+    setTimeout(async ()=>{
+      await notify(`${i+1}/${unchecked.length}  ${course.name}`,{
         body:catName?'📍 '+catName:'',
         tag:'course-item-'+i,
-        silent:true  // silencieux sauf le premier
+        silent:true
       });
-    },(i+1)*400);
+    },(i+1)*500);
   });
 }
 
